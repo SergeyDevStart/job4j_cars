@@ -66,6 +66,17 @@ public class CrudRepository {
         return tx(command);
     }
 
+    public boolean executeUpdate(String query, Map<String, Object> args) {
+        Function<Session, Boolean> command = session -> {
+            var sq = session.createQuery(query);
+            for (Map.Entry<String, Object> arg : args.entrySet()) {
+                sq.setParameter(arg.getKey(), arg.getValue());
+            }
+            return sq.executeUpdate() > 0;
+        };
+        return tx(command);
+    }
+
     public <T> T tx(Function<Session, T> command) {
         Transaction transaction = null;
         try (var session = sf.openSession()) {
