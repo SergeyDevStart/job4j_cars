@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -25,7 +27,6 @@ public class Owner {
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "USER_ID_FK"))
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "history_id", foreignKey = @ForeignKey(name = "HISTORY_ID_FK"))
-    private History history;
+    @OneToMany(mappedBy = "owners")
+    private Set<HistoryOwners> historyOwners = new HashSet<>();
 }
