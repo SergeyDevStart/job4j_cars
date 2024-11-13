@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.Post;
 import ru.job4j.cars.repository.CrudRepository;
 
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,6 +53,32 @@ public class HibernatePostRepository implements PostRepository {
                 "FROM Post WHERE id = :id",
                 Post.class,
                 Map.of("id", id)
+        );
+    }
+
+    @Override
+    public Collection<Post> findPostsWithFile() {
+        return crudRepository.query(
+                "FROM Post p WHERE p.file_id IS NOT NULL",
+                Post.class
+        );
+    }
+
+    @Override
+    public Collection<Post> findAllLastDay() {
+        return crudRepository.query(
+                "FROM Post p WHERE p.created = :today",
+                Post.class,
+                Map.of("today", LocalDate.now().atStartOfDay())
+        );
+    }
+
+    @Override
+    public Collection<Post> findByBrand(String brand) {
+        return crudRepository.query(
+                "FROM Post p WHERE p.brand = :brand",
+                Post.class,
+                Map.of("brand", brand)
         );
     }
 }

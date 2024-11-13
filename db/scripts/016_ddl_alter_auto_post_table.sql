@@ -1,0 +1,3 @@
+ALTER TABLE auto_post
+ADD COLUMN IF NOT EXISTS file_id BIGINT
+REFERENCES files(id);

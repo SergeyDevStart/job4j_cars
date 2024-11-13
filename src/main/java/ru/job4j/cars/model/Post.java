@@ -35,6 +35,14 @@ public class Post {
     @JoinColumn(name = "auto_post_id")
     List<PriceHistory> priceHistories = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "file_id")
+    private File file;
+
+    @JoinColumn(name = "brand")
+    @Enumerated(EnumType.STRING)
+    private Brand brand;
+
     @ManyToMany
     @JoinTable(
             name = "participates",
