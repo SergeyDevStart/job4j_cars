@@ -9,7 +9,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -33,11 +35,11 @@ public class Post {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "auto_post_id")
-    List<PriceHistory> priceHistories = new ArrayList<>();
+    private List<PriceHistory> priceHistories = new ArrayList<>();
 
-    @ManyToOne
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "file_id")
-    private File file;
+    private Set<File> files = new HashSet<>();
 
     @JoinColumn(name = "brand")
     @Enumerated(EnumType.STRING)
