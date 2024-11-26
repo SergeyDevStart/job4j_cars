@@ -1,55 +1,49 @@
 package ru.job4j.cars.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"user", "priceHistories", "files", "car", "participates"})
 @Entity
 @Table(name = "auto_post")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Post {
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String description;
 
-    private LocalDateTime created = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+    private LocalDateTime created = LocalDateTime.now().withSecond(0);
 
-    @ManyToOne
-    @JoinColumn(name = "auto_user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "auto_post_id")
     private List<PriceHistory> priceHistories = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "file_id")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "auto_post_id")
     private Set<File> files = new HashSet<>();
 
     @JoinColumn(name = "brand")
     @Enumerated(EnumType.STRING)
     private Brand brand;
 
-    @ManyToMany
-    @JoinTable(
-            name = "participates",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> participates = new ArrayList<>();
+    @JoinColumn(name = "car_id", foreignKey = @ForeignKey(name = "CAR_ID_FK"))
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Car car;
+
+    @OneToMany(mappedBy = "post")
+    private Set<Participant> participates = new HashSet<>();
 }

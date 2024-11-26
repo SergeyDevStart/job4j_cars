@@ -17,13 +17,18 @@ public class Car {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Owner owner;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "engine_id", foreignKey = @ForeignKey(name = "ENGINE_ID_FK"))
     private Engine engine;
 
     @OneToMany(mappedBy = "car")
     private Set<HistoryOwners> historyOwners = new HashSet<>();
+
+    @OneToMany(mappedBy = "car")
+    private Set<Participant> participates = new HashSet<>();
 }
