@@ -3,10 +3,11 @@ package ru.job4j.cars.repository.post;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import ru.job4j.cars.model.Brand;
 import ru.job4j.cars.model.Post;
 import ru.job4j.cars.repository.CrudRepository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -29,9 +30,9 @@ public class HibernatePostRepository implements PostRepository {
     }
 
     @Override
-    public boolean update(Post post) {
+    public boolean delete(Post post) {
         try {
-            crudRepository.run(session -> session.merge(post));
+            crudRepository.run(session -> session.delete(post));
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -40,11 +41,14 @@ public class HibernatePostRepository implements PostRepository {
     }
 
     @Override
-    public boolean deleteById(Integer id) {
-        return crudRepository.executeUpdate(
-                "DELETE Post WHERE id = :id",
-                Map.of("id", id)
-        );
+    public boolean update(Post post) {
+        try {
+            crudRepository.run(session -> session.merge(post));
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return false;
     }
 
     @Override
@@ -57,9 +61,17 @@ public class HibernatePostRepository implements PostRepository {
     }
 
     @Override
+    public Collection<Post> findAll() {
+        return crudRepository.query(
+                "FROM Post",
+                Post.class
+        );
+    }
+
+    @Override
     public Collection<Post> findPostsWithFile() {
         return crudRepository.query(
-                "FROM Post p WHERE p.file_id IS NOT NULL",
+                "FROM Post post WHERE post.files IS NOT EMPTY",
                 Post.class
         );
     }
@@ -67,18 +79,23 @@ public class HibernatePostRepository implements PostRepository {
     @Override
     public Collection<Post> findAllLastDay() {
         return crudRepository.query(
-                "FROM Post p WHERE p.created = :today",
+                "FROM Post post WHERE post.created > :yesterday",
                 Post.class,
-                Map.of("today", LocalDate.now().atStartOfDay())
+                Map.of("yesterday", LocalDateTime.now().minusDays(1))
         );
     }
 
     @Override
     public Collection<Post> findByBrand(String brand) {
-        return crudRepository.query(
-                "FROM Post p WHERE p.brand = :brand",
-                Post.class,
-                Map.of("brand", brand)
-        );
+        try {
+            Brand enumBrand = Brand.valueOf(brand.toUpperCase());
+            return crudRepository.query(
+                    "FROM Post p WHERE p.brand = :brand",
+                    Post.class,
+                    Map.of("brand", enumBrand)
+            );
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid brand: " + brand, e);
+        }
     }
 }

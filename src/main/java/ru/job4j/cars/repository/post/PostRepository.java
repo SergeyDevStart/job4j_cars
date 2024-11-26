@@ -10,9 +10,11 @@ public interface PostRepository {
 
     boolean update(Post post);
 
-    boolean deleteById(Integer id);
+    boolean delete(Post post);
 
     Optional<Post> findById(Integer id);
+
+    Collection<Post> findAll();
 
     Collection<Post> findPostsWithFile();
 
