@@ -19,9 +19,8 @@ public class Post {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String description;
-
+    private boolean status;
     private LocalDateTime created = LocalDateTime.now().withSecond(0);
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,7 +35,6 @@ public class Post {
     @JoinColumn(name = "auto_post_id")
     private Set<File> files = new HashSet<>();
 
-    @JoinColumn(name = "brand")
     @Enumerated(EnumType.STRING)
     private Brand brand;
 

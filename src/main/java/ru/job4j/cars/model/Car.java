@@ -12,17 +12,31 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Car {
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "body")
+    private Body body;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gearbox")
+    private Gearbox gearbox;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_drive")
+    private TypeDrive typeDrive;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Owner owner;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "engine_id", foreignKey = @ForeignKey(name = "ENGINE_ID_FK"))
     private Engine engine;
 
