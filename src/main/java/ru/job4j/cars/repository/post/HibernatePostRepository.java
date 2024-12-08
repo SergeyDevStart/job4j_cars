@@ -7,6 +7,7 @@ import ru.job4j.cars.model.Brand;
 import ru.job4j.cars.model.Post;
 import ru.job4j.cars.repository.CrudRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
@@ -63,7 +64,12 @@ public class HibernatePostRepository implements PostRepository {
     @Override
     public Collection<Post> findAll() {
         return crudRepository.query(
-                "FROM Post",
+                """
+                        SELECT DISTINCT post
+                        FROM Post post
+                        LEFT JOIN FETCH post.files
+                        LEFT JOIN FETCH post.priceHistories
+                        """,
                 Post.class
         );
     }
@@ -71,7 +77,13 @@ public class HibernatePostRepository implements PostRepository {
     @Override
     public Collection<Post> findPostsWithFile() {
         return crudRepository.query(
-                "FROM Post post WHERE post.files IS NOT EMPTY",
+                """
+                        SELECT DISTINCT post
+                        FROM Post post
+                        LEFT JOIN FETCH post.files
+                        LEFT JOIN FETCH post.priceHistories
+                        WHERE post.files IS NOT EMPTY
+                        """,
                 Post.class
         );
     }
@@ -79,9 +91,15 @@ public class HibernatePostRepository implements PostRepository {
     @Override
     public Collection<Post> findAllLastDay() {
         return crudRepository.query(
-                "FROM Post post WHERE post.created > :yesterday",
+                """
+                    SELECT DISTINCT post
+                    FROM Post post
+                    LEFT JOIN FETCH post.files
+                    LEFT JOIN FETCH post.priceHistories
+                    WHERE post.created > :yesterday
+                    """,
                 Post.class,
-                Map.of("yesterday", LocalDateTime.now().minusDays(1))
+                Map.of("yesterday", LocalDate.now().atStartOfDay())
         );
     }
 

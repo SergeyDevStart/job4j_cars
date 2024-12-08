@@ -14,6 +14,8 @@ import ru.job4j.cars.model.Engine;
 import ru.job4j.cars.model.HistoryOwners;
 import ru.job4j.cars.model.Owner;
 import ru.job4j.cars.repository.CrudRepository;
+import ru.job4j.cars.repository.engine.EngineRepository;
+import ru.job4j.cars.repository.engine.HibernateEngineRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HibernateCarRepositoryTest {
     private static SessionFactory sf;
     private static CarRepository carRepository;
+    private static EngineRepository engineRepository;
     private static Set<HistoryOwners> historyOwners = new HashSet<>();
 
     @BeforeAll
@@ -31,7 +34,9 @@ class HibernateCarRepositoryTest {
         final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
                 .configure().build();
         sf = new MetadataSources(registry).buildMetadata().buildSessionFactory();
-        carRepository = new HibernateCarRepository(new CrudRepository(sf));
+        CrudRepository crudRepository = new CrudRepository(sf);
+        carRepository = new HibernateCarRepository(crudRepository);
+        engineRepository = new HibernateEngineRepository(crudRepository);
     }
 
     @AfterAll
@@ -58,7 +63,10 @@ class HibernateCarRepositoryTest {
     private Car getCar() {
         Car car = new Car();
         car.setOwner(new Owner());
-        car.setEngine(new Engine());
+        Engine engine = new Engine();
+        engine.setName("дизель");
+        engineRepository.save(engine);
+        car.setEngine(engine);
         car.setHistoryOwners(historyOwners);
         return car;
     }

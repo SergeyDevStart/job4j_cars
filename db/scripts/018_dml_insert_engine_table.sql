@@ -1,0 +1,1 @@
+INSERT INTO engine (name) VALUES ('БЕНЗИН'), ('ДИЗЕЛЬ'), ('ЭЛЕКТРО');
