@@ -1,16 +1,13 @@
 package ru.job4j.cars.mappers;
 
-import lombok.AllArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import ru.job4j.cars.dto.PostCardDto;
 import ru.job4j.cars.dto.PostCreateDto;
-import ru.job4j.cars.model.Engine;
 import ru.job4j.cars.model.File;
 import ru.job4j.cars.model.Post;
 import ru.job4j.cars.model.PriceHistory;
-import ru.job4j.cars.repository.engine.EngineRepository;
 
 import java.util.ArrayList;
 import java.util.List;

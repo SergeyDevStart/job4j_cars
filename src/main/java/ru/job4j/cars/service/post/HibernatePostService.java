@@ -3,15 +3,19 @@ package ru.job4j.cars.service.post;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCardDto;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.mappers.PostMapper;
 import ru.job4j.cars.model.Engine;
+import ru.job4j.cars.model.File;
 import ru.job4j.cars.model.Post;
 import ru.job4j.cars.repository.engine.EngineRepository;
 import ru.job4j.cars.repository.post.PostRepository;
+import ru.job4j.cars.service.file.FileService;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,16 +26,22 @@ import java.util.stream.Collectors;
 public class HibernatePostService implements PostService {
     private final PostRepository hibernatePostRepository;
     private final EngineRepository hibernateEngineRepository;
+    private final FileService hibernateFileService;
     private final PostMapper postMapper;
 
     @Override
-    public Optional<Post> create(Post post) {
+    public Optional<Post> create(PostCreateDto postDto, FileDto fileDto) {
+        Post post = getPostFromPostDto(postDto);
+        saveNewFile(post, fileDto);
         return hibernatePostRepository.create(post);
     }
 
-    @Override
-    public Optional<Post> create(PostCreateDto dto) {
-        return hibernatePostRepository.create(getPostFromPostDto(dto));
+    private void saveNewFile(Post post, FileDto fileDto) {
+        File file = hibernateFileService.toFileFromFileDto(fileDto);
+        if (post.getFiles() == null) {
+            post.setFiles(new HashSet<>());
+        }
+        post.getFiles().add(file);
     }
 
     @Override

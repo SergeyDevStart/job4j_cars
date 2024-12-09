@@ -3,10 +3,9 @@ package ru.job4j.cars.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.service.engine.EngineService;
 import ru.job4j.cars.service.post.PostService;
@@ -48,9 +47,11 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public String saveNewPost(@ModelAttribute PostCreateDto dto, Model model) {
-        var savedPost = hibernatePostService.create(dto);
-        if (savedPost.isEmpty()) {
+    public String saveNewPost(@ModelAttribute PostCreateDto postDto, @RequestParam MultipartFile file, Model model) {
+        try {
+            var fileDto = new FileDto(file.getOriginalFilename(), file.getBytes());
+            hibernatePostService.create(postDto, fileDto);
+        } catch (Exception e) {
             model.addAttribute("message", "Не удалось создать объявление.");
             return "errors/error";
         }

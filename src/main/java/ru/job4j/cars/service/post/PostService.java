@@ -1,5 +1,6 @@
 package ru.job4j.cars.service.post;
 
+import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCardDto;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.model.Post;
@@ -9,9 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostService {
-    Optional<Post> create(Post post);
-
-    Optional<Post> create(PostCreateDto dto);
+    Optional<Post> create(PostCreateDto postDto, FileDto fileDto);
 
     boolean update(Post post);
 
