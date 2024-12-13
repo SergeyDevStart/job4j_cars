@@ -7,6 +7,7 @@ import ru.job4j.cars.model.Post;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface PostService {
@@ -27,4 +28,6 @@ public interface PostService {
     Collection<Post> findByBrand(String brand);
 
     Collection<PostCardDto> getPostCardDtoList(Collection<Post> posts);
+
+    Map<String, List<String>> getValuesForCreate();
 }

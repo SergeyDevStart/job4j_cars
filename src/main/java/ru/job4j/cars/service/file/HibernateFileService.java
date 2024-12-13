@@ -78,4 +78,9 @@ public class HibernateFileService implements FileService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public FileDto getNewFileDto(String name, byte[] content) {
+        return new FileDto(name, content);
+    }
 }

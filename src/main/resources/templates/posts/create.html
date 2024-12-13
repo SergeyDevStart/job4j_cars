@@ -9,62 +9,84 @@
 
     <title>New Post</title>
 </head>
-<body>
-<div class="container-fluid p-0">
-    <header th:insert="~{blocks/header :: header}"></header>
-    <div class="container">
+<body class="bg-light">
+<header th:insert="~{blocks/header :: header}"></header>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="border rounded bg-white shadow p-4" style="max-width: 500px; width: 100%;">
         <form class="mt-3" th:action="@{/posts/create}" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="brand" class="form-label"><b>Бренд</b></label>
-                <input type="text" class="form-control" id="brand" name="brand" placeholder="Введите марку авто">
-            </div>
-            <div class="mb-3">
-                <label for="formFile"><b>Фото</b></label>
-                <input class="form-control form-control-sm w-100" type="file" id="formFile" name="file" required>
+                <select class="form-select" id="brand" name="brand">
+                    <option value="" disabled selected>Выберите марку машины</option>
+                    <th:block th:each="brand : ${valuesForCreate['brand']}">
+                        <option th:value="${brand}" th:text="${brand}"></option>
+                    </th:block>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="carName" class="form-label"><b>Модель</b></label>
                 <input type="text" class="form-control" id="carName" name="carName" placeholder="Введите модель авто">
             </div>
             <div class="mb-3">
+                <label for="formFile"><b>Фото</b></label>
+                <input class="form-control form-control-sm w-100" type="file" id="formFile" name="file">
+            </div>
+                <div class="mb-3">
+                    <label for="body" class="form-label"><b>Кузов</b></label>
+                    <select class="form-select" id="body" name="body">
+                        <option value="" disabled selected>Выберите тип кузова</option>
+                        <th:block th:each="body : ${valuesForCreate['body']}">
+                            <option th:value="${body}" th:text="${body}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="gearbox" class="form-label"><b>Коробка передач</b></label>
+                    <select class="form-select" id="gearbox" name="gearbox">
+                        <option value="" disabled selected>Выберите коробку передач</option>
+                        <th:block th:each="gearbox : ${valuesForCreate['gearbox']}">
+                            <option th:value="${gearbox}" th:text="${gearbox}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="typeDrive" class="form-label"><b>Привод</b></label>
+                    <select class="form-select" id="typeDrive" name="typeDrive">
+                        <option value="" disabled selected>Выберите тип привода</option>
+                        <th:block th:each="typeDrive : ${valuesForCreate['typeDrive']}">
+                            <option th:value="${typeDrive}" th:text="${typeDrive}"></option>
+                        </th:block>
+                    </select>
+                </div>
             <div class="mb-3">
-                <label for="description" class="form-label"><b>Описание</b></label>
-                <textarea class="form-control" id="description" name="description" rows="5" placeholder="Добавьте описание"></textarea>
+                <label for="engine" class="form-label"><b>Двигатель</b></label>
+                <select class="form-select" id="engine" name="engineId">
+                    <option value="" disabled selected>Выберите тип двигателя</option>
+                    <th:block th:each="engine : ${engines}">
+                        <option th:value="${engine.id}" th:text="${engine.name}"></option>
+                    </th:block>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="price" class="form-label"><b>Цена</b></label>
                 <input type="number" class="form-control" id="price" name="price" rows="5" placeholder="Укажите цену">
             </div>
             <div class="mb-3">
-                <label for="body" class="form-label"><b>Кузов</b></label>
-                <input type="text" class="form-control" id="body" name="body" placeholder="Выберете тип кузова">
-            </div>
-            <div class="mb-3">
-                <label for="gearbox" class="form-label"><b>Коробка передач</b></label>
-                <input type="text" class="form-control" id="gearbox" name="gearbox" placeholder="Выберете коробку передач">
-            </div>
-            <div class="mb-3">
-                <label for="typeDrive" class="form-label"><b>Привод</b></label>
-                <input type="text" class="form-control" id="typeDrive" name="typeDrive" placeholder="Выберете тип привода">
-            </div>
-            <div class="mb-3">
-                <label for="engine"><b>Двигатель</b></label>
-                <select class="form-control" id="engine" name="engineId">
-                    <option th:each="engine : ${engines}" th:value="${engine.id}" th:text="${engine.name}"></option>
-                </select>
+                <label for="description" class="form-label"><b>Описание</b></label>
+                <textarea class="form-control" id="description" name="description" rows="5" placeholder="Добавьте описание"></textarea>
             </div>
             <div class="mb-3 row">
                 <div class="col-6"></div>
                 <div class="col-6">
-                    <div class="row">
-                        <div class="col-6"><a class="btn btn-danger w-100" th:href="@{/}">Отмена</a></div>
-                        <div class="col-6"><button class="btn btn-primary w-100" type="submit" >Сохранить</button></div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <div class="col-6"><a class="btn btn-danger w-120" th:href="@{/}">Отмена</a></div>
+                        <div class="col-6"><button class="btn btn-primary w-120" type="submit" >Сохранить</button></div>
                     </div>
                 </div>
             </div>
         </form>
     </div>
-    <footer th:insert="~{blocks/footer :: footer}" class="mt-5"></footer>
 </div>
+<footer th:insert="~{blocks/footer :: footer}" class="mt-5"></footer>
 </body>
 </html>

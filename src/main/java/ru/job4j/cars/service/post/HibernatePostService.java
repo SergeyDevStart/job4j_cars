@@ -7,17 +7,12 @@ import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCardDto;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.mappers.PostMapper;
-import ru.job4j.cars.model.Engine;
-import ru.job4j.cars.model.File;
-import ru.job4j.cars.model.Post;
+import ru.job4j.cars.model.*;
 import ru.job4j.cars.repository.engine.EngineRepository;
 import ru.job4j.cars.repository.post.PostRepository;
 import ru.job4j.cars.service.file.FileService;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,5 +91,15 @@ public class HibernatePostService implements PostService {
         return posts.stream()
                 .map(postMapper::toPostCardDtoFromPost)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, List<String>> getValuesForCreate() {
+        Map<String, List<String>> enumMap = new HashMap<>();
+        enumMap.put("body", Arrays.stream(Body.values()).map(Enum::name).toList());
+        enumMap.put("brand", Arrays.stream(Brand.values()).map(Enum::name).toList());
+        enumMap.put("gearbox", Arrays.stream(Gearbox.values()).map(Enum::name).toList());
+        enumMap.put("typeDrive", Arrays.stream(TypeDrive.values()).map(Enum::name).toList());
+        return enumMap;
     }
 }
