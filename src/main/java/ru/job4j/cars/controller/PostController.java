@@ -11,6 +11,8 @@ import ru.job4j.cars.service.engine.EngineService;
 import ru.job4j.cars.service.file.FileService;
 import ru.job4j.cars.service.post.PostService;
 
+import java.util.*;
+
 @Controller
 @AllArgsConstructor
 @RequestMapping("/posts")
@@ -50,14 +52,33 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public String saveNewPost(@ModelAttribute PostCreateDto postDto, @RequestParam MultipartFile file, Model model) {
+    public String saveNewPost(@ModelAttribute PostCreateDto postDto, @RequestParam("files") MultipartFile[] files, Model model) {
         try {
-            var fileDto = hibernateFileService.getNewFileDto(file.getOriginalFilename(), file.getBytes());
-            hibernatePostService.create(postDto, fileDto);
+            Set<FileDto> filesDtoSet = new HashSet<>();
+            for (MultipartFile file : files) {
+                var fileDto = hibernateFileService.getNewFileDto(file.getOriginalFilename(), file.getBytes());
+                filesDtoSet.add(fileDto);
+            }
+            hibernatePostService.create(postDto, filesDtoSet);
         } catch (Exception e) {
             model.addAttribute("message", "Не удалось создать объявление.");
-            return "errors/error";
+            return "errors/404";
         }
         return "redirect:/index";
+    }
+
+    @GetMapping("/{id}")
+    public String getPostById(@PathVariable("id") Integer id, Model model) {
+        var optionalPost = hibernatePostService.findById(id);
+        if (optionalPost.isEmpty()) {
+            model.addAttribute("message", "Not Found.");
+            return "errors/404";
+        }
+        var post = optionalPost.get();
+        model.addAttribute("files", hibernatePostService.getSortedFiles(post.getFiles()));
+        model.addAttribute("price",
+                post.getPriceHistories().get(post.getPriceHistories().size() - 1).getAfter());
+        model.addAttribute("post", post);
+        return "posts/detail";
     }
 }

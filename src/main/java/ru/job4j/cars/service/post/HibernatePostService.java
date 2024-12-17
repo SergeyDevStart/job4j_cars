@@ -25,18 +25,17 @@ public class HibernatePostService implements PostService {
     private final PostMapper postMapper;
 
     @Override
-    public Optional<Post> create(PostCreateDto postDto, FileDto fileDto) {
+    public Optional<Post> create(PostCreateDto postDto, Set<FileDto> filesDtoSet) {
         Post post = getPostFromPostDto(postDto);
-        saveNewFile(post, fileDto);
+        saveNewFile(post, filesDtoSet);
         return hibernatePostRepository.create(post);
     }
 
-    private void saveNewFile(Post post, FileDto fileDto) {
-        File file = hibernateFileService.toFileFromFileDto(fileDto);
-        if (post.getFiles() == null) {
-            post.setFiles(new HashSet<>());
+    private void saveNewFile(Post post, Set<FileDto> fileDtoSet) {
+        for (FileDto fileDto : fileDtoSet) {
+            File file = hibernateFileService.toFileFromFileDto(fileDto);
+            post.addFile(file);
         }
-        post.getFiles().add(file);
     }
 
     @Override
@@ -51,7 +50,12 @@ public class HibernatePostService implements PostService {
 
     @Override
     public Optional<Post> findById(Integer id) {
-        return hibernatePostRepository.findById(id);
+        var optionalPost =  hibernatePostRepository.findById(id);
+        if (optionalPost.isEmpty()) {
+            log.warn("Post with ID {} not found", id);
+            return Optional.empty();
+        }
+        return optionalPost;
     }
 
     @Override
@@ -89,7 +93,11 @@ public class HibernatePostService implements PostService {
     @Override
     public List<PostCardDto> getPostCardDtoList(Collection<Post> posts) {
         return posts.stream()
-                .map(postMapper::toPostCardDtoFromPost)
+                .map(post -> {
+                    var dto = postMapper.toPostCardDtoFromPost(post);
+                    dto.setId(post.getId());
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -101,5 +109,12 @@ public class HibernatePostService implements PostService {
         enumMap.put("gearbox", Arrays.stream(Gearbox.values()).map(Enum::name).toList());
         enumMap.put("typeDrive", Arrays.stream(TypeDrive.values()).map(Enum::name).toList());
         return enumMap;
+    }
+
+    @Override
+    public List<File> getSortedFiles(Set<File> files) {
+        List<File> sortedFiles = new ArrayList<>(files);
+        sortedFiles.sort(Comparator.comparing(File::getId));
+        return sortedFiles;
     }
 }

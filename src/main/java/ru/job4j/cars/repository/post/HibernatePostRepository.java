@@ -8,7 +8,6 @@ import ru.job4j.cars.model.Post;
 import ru.job4j.cars.repository.CrudRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +54,16 @@ public class HibernatePostRepository implements PostRepository {
     @Override
     public Optional<Post> findById(Integer id) {
         return crudRepository.optional(
-                "FROM Post WHERE id = :id",
+                """
+                FROM Post post
+                LEFT JOIN FETCH post.files
+                LEFT JOIN FETCH post.priceHistories
+                LEFT JOIN FETCH post.car car
+                LEFT JOIN FETCH car.engine
+                LEFT JOIN FETCH car.owner
+                LEFT JOIN FETCH car.historyOwners
+                WHERE post.id = :id
+                """,
                 Post.class,
                 Map.of("id", id)
         );

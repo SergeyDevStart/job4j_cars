@@ -9,11 +9,11 @@ import java.util.*;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"user", "priceHistories", "files", "car", "participates"})
-@Entity
 @Table(name = "auto_post")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Entity
 public class Post {
     @Id
     @EqualsAndHashCode.Include
@@ -31,6 +31,7 @@ public class Post {
     @JoinColumn(name = "auto_post_id")
     private List<PriceHistory> priceHistories = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "auto_post_id")
     private Set<File> files = new HashSet<>();
@@ -44,4 +45,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     private Set<Participant> participates = new HashSet<>();
+
+    public void addFile(File file) {
+        files.add(file);
+        file.setPost(this);
+    }
 }
