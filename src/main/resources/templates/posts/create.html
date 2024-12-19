@@ -18,7 +18,7 @@
                 <label for="brand" class="form-label"><b>Бренд</b></label>
                 <select class="form-select" id="brand" name="brand">
                     <option value="" disabled selected>Выберите марку машины</option>
-                    <th:block th:each="brand : ${valuesForCreate['brand']}">
+                    <th:block th:each="brand : ${categories['brand']}">
                         <option th:value="${brand}" th:text="${brand}"></option>
                     </th:block>
                 </select>
@@ -39,7 +39,7 @@
                     <label for="body" class="form-label"><b>Кузов</b></label>
                     <select class="form-select" id="body" name="body">
                         <option value="" disabled selected>Выберите тип кузова</option>
-                        <th:block th:each="body : ${valuesForCreate['body']}">
+                        <th:block th:each="body : ${categories['body']}">
                             <option th:value="${body}" th:text="${body}"></option>
                         </th:block>
                     </select>
@@ -48,7 +48,7 @@
                     <label for="gearbox" class="form-label"><b>Коробка передач</b></label>
                     <select class="form-select" id="gearbox" name="gearbox">
                         <option value="" disabled selected>Выберите коробку передач</option>
-                        <th:block th:each="gearbox : ${valuesForCreate['gearbox']}">
+                        <th:block th:each="gearbox : ${categories['gearbox']}">
                             <option th:value="${gearbox}" th:text="${gearbox}"></option>
                         </th:block>
                     </select>
@@ -57,7 +57,7 @@
                     <label for="typeDrive" class="form-label"><b>Привод</b></label>
                     <select class="form-select" id="typeDrive" name="typeDrive">
                         <option value="" disabled selected>Выберите тип привода</option>
-                        <th:block th:each="typeDrive : ${valuesForCreate['typeDrive']}">
+                        <th:block th:each="typeDrive : ${categories['typeDrive']}">
                             <option th:value="${typeDrive}" th:text="${typeDrive}"></option>
                         </th:block>
                     </select>

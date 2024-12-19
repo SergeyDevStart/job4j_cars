@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCardDto;
 import ru.job4j.cars.dto.PostCreateDto;
+import ru.job4j.cars.dto.SearchDto;
 import ru.job4j.cars.mappers.PostMapper;
 import ru.job4j.cars.model.*;
 import ru.job4j.cars.repository.engine.EngineRepository;
@@ -102,7 +103,7 @@ public class HibernatePostService implements PostService {
     }
 
     @Override
-    public Map<String, List<String>> getValuesForCreate() {
+    public Map<String, List<String>> getCategories() {
         Map<String, List<String>> enumMap = new HashMap<>();
         enumMap.put("body", Arrays.stream(Body.values()).map(Enum::name).toList());
         enumMap.put("brand", Arrays.stream(Brand.values()).map(Enum::name).toList());
@@ -116,5 +117,10 @@ public class HibernatePostService implements PostService {
         List<File> sortedFiles = new ArrayList<>(files);
         sortedFiles.sort(Comparator.comparing(File::getId));
         return sortedFiles;
+    }
+
+    @Override
+    public List<Post> findSearchResult(SearchDto searchDto) {
+        return hibernatePostRepository.findSearchResult(searchDto);
     }
 }

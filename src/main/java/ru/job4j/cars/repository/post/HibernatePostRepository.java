@@ -2,15 +2,16 @@ package ru.job4j.cars.repository.post;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
-import ru.job4j.cars.model.Brand;
-import ru.job4j.cars.model.Post;
+import ru.job4j.cars.dto.SearchDto;
+import ru.job4j.cars.model.*;
 import ru.job4j.cars.repository.CrudRepository;
 
+import javax.persistence.criteria.*;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 
 @AllArgsConstructor
 @Repository
@@ -123,5 +124,37 @@ public class HibernatePostRepository implements PostRepository {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid brand: " + brand, e);
         }
+    }
+
+    @Override
+    public List<Post> findSearchResult(SearchDto searchDto) {
+        Function<Session, List<Post>> command = session -> {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Post> query = cb.createQuery(Post.class);
+            Root<Post> post = query.from(Post.class);
+            Join<Post, Car> carJoin = post.join("car");
+            Join<Car, Engine> engineJoin = carJoin.join("engine");
+            post.fetch("files", JoinType.LEFT);
+            post.fetch("priceHistories", JoinType.LEFT);
+            List<Predicate> predicates = new ArrayList<>();
+            if (searchDto.getBrand() != null && !searchDto.getBrand().isEmpty()) {
+                predicates.add(cb.equal(post.get("brand"), Brand.valueOf(searchDto.getBrand())));
+            }
+            if (searchDto.getBody() != null && !searchDto.getBody().isEmpty()) {
+                predicates.add(cb.equal(carJoin.get("body"), Body.valueOf(searchDto.getBody())));
+            }
+            if (searchDto.getGearbox() != null && !searchDto.getGearbox().isEmpty()) {
+                predicates.add(cb.equal(carJoin.get("gearbox"), Gearbox.valueOf(searchDto.getGearbox())));
+            }
+            if (searchDto.getTypeDrive() != null && !searchDto.getTypeDrive().isEmpty()) {
+                predicates.add(cb.equal(carJoin.get("typeDrive"), TypeDrive.valueOf(searchDto.getTypeDrive())));
+            }
+            if (searchDto.getEngine() != null && !searchDto.getEngine().isEmpty()) {
+                predicates.add(cb.equal(engineJoin.get("name"), searchDto.getEngine()));
+            }
+            query.select(post).where(predicates.toArray(new Predicate[0]));
+            return session.createQuery(query).getResultList();
+        };
+        return crudRepository.tx(command);
     }
 }

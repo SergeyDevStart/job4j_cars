@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCreateDto;
+import ru.job4j.cars.dto.SearchDto;
+import ru.job4j.cars.repository.CrudRepository;
+import ru.job4j.cars.repository.post.HibernatePostRepository;
 import ru.job4j.cars.service.engine.EngineService;
 import ru.job4j.cars.service.file.FileService;
 import ru.job4j.cars.service.post.PostService;
@@ -47,7 +50,7 @@ public class PostController {
     @GetMapping("/create")
     public String getCreatePage(Model model) {
         model.addAttribute("engines", hibernateEngineService.findAll());
-        model.addAttribute("valuesForCreate", hibernatePostService.getValuesForCreate());
+        model.addAttribute("categories", hibernatePostService.getCategories());
         return "posts/create";
     }
 
@@ -80,5 +83,21 @@ public class PostController {
                 post.getPriceHistories().get(post.getPriceHistories().size() - 1).getAfter());
         model.addAttribute("post", post);
         return "posts/detail";
+    }
+
+    @GetMapping("/categories")
+    public String getCategoriesPage(Model model) {
+        model.addAttribute("posts", hibernatePostService.getPostCardDtoList(hibernatePostService.findAll()));
+        model.addAttribute("engines", hibernateEngineService.findAll());
+        model.addAttribute("categories", hibernatePostService.getCategories());
+        return "posts/categories";
+    }
+
+    @PostMapping("/search")
+    public String getSearchResult(@ModelAttribute SearchDto searchDto, Model model) {
+        model.addAttribute("posts", hibernatePostService.getPostCardDtoList(hibernatePostService.findSearchResult(searchDto)));
+        model.addAttribute("engines", hibernateEngineService.findAll());
+        model.addAttribute("categories", hibernatePostService.getCategories());
+        return "posts/categories";
     }
 }

@@ -1,10 +1,16 @@
 package ru.job4j.cars.model;
 
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -34,6 +40,7 @@ public class Post {
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "auto_post_id")
+    @Fetch(FetchMode.SUBSELECT)
     private Set<File> files = new HashSet<>();
 
     @Enumerated(EnumType.STRING)

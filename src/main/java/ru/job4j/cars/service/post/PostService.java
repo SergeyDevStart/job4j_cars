@@ -3,6 +3,7 @@ package ru.job4j.cars.service.post;
 import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCardDto;
 import ru.job4j.cars.dto.PostCreateDto;
+import ru.job4j.cars.dto.SearchDto;
 import ru.job4j.cars.model.File;
 import ru.job4j.cars.model.Post;
 
@@ -29,5 +30,7 @@ public interface PostService {
 
     Collection<PostCardDto> getPostCardDtoList(Collection<Post> posts);
 
-    Map<String, List<String>> getValuesForCreate();
+    Map<String, List<String>> getCategories();
+
+    List<Post> findSearchResult(SearchDto searchDto);
 }
