@@ -8,13 +8,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.dto.SearchDto;
-import ru.job4j.cars.repository.CrudRepository;
-import ru.job4j.cars.repository.post.HibernatePostRepository;
 import ru.job4j.cars.service.engine.EngineService;
 import ru.job4j.cars.service.file.FileService;
 import ru.job4j.cars.service.post.PostService;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 @AllArgsConstructor
@@ -99,5 +98,18 @@ public class PostController {
         model.addAttribute("engines", hibernateEngineService.findAll());
         model.addAttribute("categories", hibernatePostService.getCategories());
         return "posts/categories";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deletePost(@PathVariable("id") Integer id, Model model) {
+        var optionalPost = hibernatePostService.findById(id);
+        if (optionalPost.isEmpty()) {
+            model.addAttribute("message", "Not Found.");
+            return "errors/404";
+        }
+        var filesToDelete = hibernatePostService.getSortedFiles(optionalPost.get().getFiles());
+        hibernateFileService.deleteFiles(filesToDelete);
+        hibernatePostService.delete(optionalPost.get());
+        return "redirect:/posts/categories";
     }
 }

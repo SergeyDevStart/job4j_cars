@@ -38,9 +38,7 @@ public class Post {
     private List<PriceHistory> priceHistories = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "auto_post_id")
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<File> files = new HashSet<>();
 
     @Enumerated(EnumType.STRING)

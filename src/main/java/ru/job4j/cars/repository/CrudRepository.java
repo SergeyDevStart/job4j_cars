@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityGraph;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

@@ -10,6 +10,7 @@ import ru.job4j.cars.repository.file.FileRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -76,6 +77,13 @@ public class HibernateFileService implements FileService {
             Files.deleteIfExists(Path.of(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteFiles(List<File> filesToDelete) {
+        for (File file : filesToDelete) {
+            deleteFile(file.getPath());
         }
     }
 

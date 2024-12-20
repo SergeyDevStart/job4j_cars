@@ -4,6 +4,7 @@ import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.model.File;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface FileService {
@@ -16,4 +17,6 @@ public interface FileService {
     void deleteById(Integer id);
 
     FileDto getNewFileDto(String name, byte[] content);
+
+    void deleteFiles(List<File> filesToDelete);
 }

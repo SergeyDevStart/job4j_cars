@@ -8,6 +8,8 @@ import ru.job4j.cars.dto.SearchDto;
 import ru.job4j.cars.model.*;
 import ru.job4j.cars.repository.CrudRepository;
 
+import javax.persistence.EntityGraph;
+import javax.persistence.Subgraph;
 import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -54,33 +56,31 @@ public class HibernatePostRepository implements PostRepository {
 
     @Override
     public Optional<Post> findById(Integer id) {
-        return crudRepository.optional(
-                """
-                FROM Post post
-                LEFT JOIN FETCH post.files
-                LEFT JOIN FETCH post.priceHistories
-                LEFT JOIN FETCH post.car car
-                LEFT JOIN FETCH car.engine
-                LEFT JOIN FETCH car.owner
-                LEFT JOIN FETCH car.historyOwners
-                WHERE post.id = :id
-                """,
-                Post.class,
-                Map.of("id", id)
-        );
+        Function<Session, Optional<Post>> command = session -> {
+            EntityGraph<Post> entityGraph = session.createEntityGraph(Post.class);
+            entityGraph.addAttributeNodes("files", "priceHistories", "car");
+            Subgraph<Car> carSubgraph = entityGraph.addSubgraph("car");
+            carSubgraph.addAttributeNodes("engine", "owner", "historyOwners");
+            var sq = session.createQuery(
+                    "FROM Post WHERE id = :id", Post.class)
+                    .setParameter("id", id)
+                    .setHint("javax.persistence.fetchgraph", entityGraph);
+            return sq.uniqueResultOptional();
+        };
+        return crudRepository.tx(command);
     }
 
     @Override
     public Collection<Post> findAll() {
-        return crudRepository.query(
-                """
-                        SELECT DISTINCT post
-                        FROM Post post
-                        LEFT JOIN FETCH post.files
-                        LEFT JOIN FETCH post.priceHistories
-                        """,
-                Post.class
-        );
+        Function<Session, Collection<Post>> command = session -> {
+            EntityGraph<Post> entityGraph = session.createEntityGraph(Post.class);
+            entityGraph.addAttributeNodes("files", "priceHistories");
+            var sq = session.createQuery(
+                            "SELECT DISTINCT post FROM Post post", Post.class)
+                    .setHint("javax.persistence.fetchgraph", entityGraph);
+            return sq.getResultList();
+        };
+        return crudRepository.tx(command);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class HibernatePostRepository implements PostRepository {
             if (searchDto.getEngine() != null && !searchDto.getEngine().isEmpty()) {
                 predicates.add(cb.equal(engineJoin.get("name"), searchDto.getEngine()));
             }
-            query.select(post).where(predicates.toArray(new Predicate[0]));
+            query.select(post).distinct(true).where(predicates.toArray(new Predicate[0]));
             return session.createQuery(query).getResultList();
         };
         return crudRepository.tx(command);

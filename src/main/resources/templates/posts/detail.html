@@ -94,98 +94,24 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-5">
+            <div class="col-6"></div>
+            <div class="col-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <a class="btn btn-dark w-100" th:href="@{/posts/categories}">назад</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a class="btn btn-info w-100" th:href="@{/posts/edit{id}/(id=${post.id})}">Редактировать</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a class="btn btn-danger w-100" th:href="@{/posts/delete/{id}(id=${post.id})}">Удалить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <footer th:insert="~{blocks/footer :: footer}"></footer>
 </div>
 </body>
-
-
-
-
-
-<!--<div class="container-fluid p-0">-->
-<!--    <header th:insert="~{blocks/header :: header}"></header>-->
-<!--    <div class="container">-->
-<!--        &lt;!&ndash; Секция с изображениями &ndash;&gt;-->
-<!--        <div class="row justify-content-md-center" style="overflow-x: auto; white-space: nowrap;">-->
-<!--            <div class="d-flex flex-wrap justify-content-start">-->
-<!--                <figure class="figure m-2" th:each="file : ${files}">-->
-<!--                    <img th:src="@{/files/{fileId}(fileId=${file.getId})}"-->
-<!--                         alt="" width="250px" height="auto" class="img-thumbnail">-->
-<!--                </figure>-->
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        <div class="row">-->
-<!--            &lt;!&ndash; Левая колонка &ndash;&gt;-->
-<!--            <div class="col-md-4">-->
-<!--                    <h2 class="mb-3" th:text="${post.brand} + ' - ' + ${post.car.name}"></h2>-->
-<!--                    <ul class="list-unstyled">-->
-<!--                        <li><b>Кузов:</b> <span th:text="${post.car.body}"></span></li>-->
-<!--                        <li><b>Коробка передач:</b> <span th:text="${post.car.gearbox}"></span></li>-->
-<!--                        <li><b>Привод:</b> <span th:text="${post.car.typeDrive}"></span></li>-->
-<!--                        <li><b>Двигатель:</b> <span th:text="${post.car.engine.name}"></span></li>-->
-<!--                    </ul>-->
-<!--                    <h4 class="mt-4">Описание:</h4>-->
-<!--                    <p th:text="${post.description}"></p>-->
-<!--            </div>-->
-
-<!--            &lt;!&ndash; Правая колонка &ndash;&gt;-->
-<!--            <div class="col-md-8">-->
-<!--                <h2 class="mb-3" th:text="${post.brand} + ' - ' + ${post.car.name}"></h2>-->
-<!--                <ul class="list-unstyled">-->
-<!--                    <li><b>Кузов:</b> <span th:text="${post.car.body}"></span></li>-->
-<!--                    <li><b>Коробка передач:</b> <span th:text="${post.car.gearbox}"></span></li>-->
-<!--                    <li><b>Привод:</b> <span th:text="${post.car.typeDrive}"></span></li>-->
-<!--                    <li><b>Двигатель:</b> <span th:text="${post.car.engine.name}"></span></li>-->
-<!--                </ul>-->
-<!--                <h4 class="mt-4">Описание:</h4>-->
-<!--                <p th:text="${post.description}"></p>-->
-<!--                <div class="border p-4 rounded">-->
-<!--                    <h4 class="mt-4">История цен</h4>-->
-<!--                    <table class="table table-bordered table-sm text-center">-->
-<!--                        <thead class="thead-light">-->
-<!--                        <tr>-->
-<!--                            <th>Дата изменения</th>-->
-<!--                            <th>Цена до</th>-->
-<!--                            <th>Цена после</th>-->
-<!--                        </tr>-->
-<!--                        </thead>-->
-<!--                        <tbody>-->
-<!--                        <tr th:each="priceHistory : ${post.priceHistories}">-->
-<!--                            <td th:text="${#temporals.format(priceHistory.created, 'dd.MM.yyyy HH:mm')}"></td>-->
-<!--                            <td th:text="${priceHistory.before}"></td>-->
-<!--                            <td th:text="${priceHistory.after}"></td>-->
-<!--                        </tr>-->
-<!--                        </tbody>-->
-<!--                    </table>-->
-
-<!--                    <h4 class="mt-4">История владельцев</h4>-->
-<!--                    <table class="table table-bordered table-sm text-center">-->
-<!--                        <thead class="thead-light">-->
-<!--                        <tr>-->
-<!--                            <th>Имя владельца</th>-->
-<!--                            <th>Дата начала</th>-->
-<!--                            <th>Дата конца</th>-->
-<!--                        </tr>-->
-<!--                        </thead>-->
-<!--                        <tbody>-->
-<!--                        <tr th:each="historyOwner : ${post.car.historyOwners}">-->
-<!--                            <td th:text="${historyOwner.owner.name}"></td>-->
-<!--                            <td th:text="${#temporals.format(historyOwner.history.startAt, 'dd.MM.yyyy HH:mm')}"></td>-->
-<!--                            <td th:text="${#temporals.format(historyOwner.history.endAt, 'dd.MM.yyyy HH:mm')}"></td>-->
-<!--                        </tr>-->
-<!--                        </tbody>-->
-<!--                    </table>-->
-
-<!--                    <div class="mt-4 d-flex justify-content-between">-->
-<!--                        <a href="/posts" class="btn btn-secondary btn-sm">Назад к списку</a>-->
-<!--                        <a href="/" class="btn btn-primary btn-sm">Подписаться</a>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <footer th:insert="~{blocks/footer :: footer}"></footer>-->
-<!--</div>-->
 </html>

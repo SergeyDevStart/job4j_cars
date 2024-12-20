@@ -91,6 +91,7 @@ public class HibernatePostService implements PostService {
         }
     }
 
+    //todo добавить owner в create и убрать вместе с id в dto
     @Override
     public List<PostCardDto> getPostCardDtoList(Collection<Post> posts) {
         return posts.stream()
