@@ -19,4 +19,6 @@ public interface FileService {
     FileDto getNewFileDto(String name, byte[] content);
 
     void deleteFiles(List<File> filesToDelete);
+
+    List<File> findAllByPostId(Integer postId);
 }

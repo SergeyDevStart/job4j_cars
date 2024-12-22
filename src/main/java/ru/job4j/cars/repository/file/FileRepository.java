@@ -2,7 +2,7 @@ package ru.job4j.cars.repository.file;
 
 import ru.job4j.cars.model.File;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface FileRepository {
@@ -10,7 +10,7 @@ public interface FileRepository {
 
     Optional<File> save(File file);
 
-    Collection<File> findAll();
+    List<File> findAllByPostId(Integer postId);
 
     void delete(File file);
 }

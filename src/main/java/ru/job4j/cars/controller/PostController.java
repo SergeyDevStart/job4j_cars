@@ -77,7 +77,7 @@ public class PostController {
             return "errors/404";
         }
         var post = optionalPost.get();
-        model.addAttribute("files", hibernatePostService.getSortedFiles(post.getFiles()));
+        model.addAttribute("files", hibernateFileService.findAllByPostId(post.getId()));
         model.addAttribute("price",
                 post.getPriceHistories().get(post.getPriceHistories().size() - 1).getAfter());
         model.addAttribute("post", post);
@@ -107,7 +107,7 @@ public class PostController {
             model.addAttribute("message", "Not Found.");
             return "errors/404";
         }
-        var filesToDelete = hibernatePostService.getSortedFiles(optionalPost.get().getFiles());
+        var filesToDelete = hibernateFileService.findAllByPostId(optionalPost.get().getId());
         hibernateFileService.deleteFiles(filesToDelete);
         hibernatePostService.delete(optionalPost.get());
         return "redirect:/posts/categories";

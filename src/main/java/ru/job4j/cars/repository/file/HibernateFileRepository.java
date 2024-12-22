@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.File;
 import ru.job4j.cars.repository.CrudRepository;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,8 +37,12 @@ public class HibernateFileRepository implements FileRepository {
     }
 
     @Override
-    public Collection<File> findAll() {
-        return crudRepository.query("FROM File", File.class);
+    public List<File> findAllByPostId(Integer postId) {
+        return crudRepository.query(
+                "FROM File f WHERE f.post.id = :postId",
+                File.class,
+                Map.of("postId", postId)
+        );
     }
 
     @Override

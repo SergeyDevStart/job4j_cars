@@ -114,13 +114,6 @@ public class HibernatePostService implements PostService {
     }
 
     @Override
-    public List<File> getSortedFiles(Set<File> files) {
-        List<File> sortedFiles = new ArrayList<>(files);
-        sortedFiles.sort(Comparator.comparing(File::getId));
-        return sortedFiles;
-    }
-
-    @Override
     public List<Post> findSearchResult(SearchDto searchDto) {
         return hibernatePostRepository.findSearchResult(searchDto);
     }
