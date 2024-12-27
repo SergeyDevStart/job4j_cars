@@ -49,7 +49,7 @@
                             </span>
                         </h6>
                         <h6>Цена: <span th:text="${price}"></span></h6>
-                        <h6>Текущий владелец: <span></span></h6>
+                        <h6>Текущий владелец: <span th:text="${post.car.owner.name}"></span></h6>
                     </div>
                 </div>
                 <div class="col m-1">
@@ -65,7 +65,7 @@
                             </thead>
                             <tbody>
                             <tr th:each="priceHistory : ${post.priceHistories}">
-                                <td th:text="${#temporals.format(priceHistory.created, 'dd.MM.yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(priceHistory.created, 'dd.MM.yyyy')}"></td>
                                 <td th:text="${priceHistory.before}"></td>
                                 <td th:text="${priceHistory.after}"></td>
                             </tr>
@@ -85,8 +85,8 @@
                             <tbody>
                             <tr th:each="historyOwner : ${post.car.historyOwners}">
                                 <td th:text="${historyOwner.owner.name}"></td>
-                                <td th:text="${#temporals.format(historyOwner.history.startAt, 'dd.MM.yyyy HH:mm')}"></td>
-                                <td th:text="${#temporals.format(historyOwner.history.endAt, 'dd.MM.yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(historyOwner.startAt, 'dd.MM.yyyy')}"></td>
+                                <td th:text="${historyOwner.endAt != null ? #temporals.format(historyOwner.endAt, 'dd.MM.yyyy') : '-'}"></td>
                             </tr>
                             </tbody>
                         </table>

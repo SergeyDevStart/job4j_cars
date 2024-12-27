@@ -1,9 +1,6 @@
 package ru.job4j.cars.model;
 
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -45,7 +42,7 @@ public class Post {
     private Brand brand;
 
     @JoinColumn(name = "car_id", foreignKey = @ForeignKey(name = "CAR_ID_FK"))
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Car car;
 
     @OneToMany(mappedBy = "post")

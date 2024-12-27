@@ -25,6 +25,8 @@ public class Owner {
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "USER_ID_FK"))
     private User user;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", orphanRemoval = true)
+    @ToString.Exclude
+    @Builder.Default
     private Set<HistoryOwners> historyOwners = new HashSet<>();
 }

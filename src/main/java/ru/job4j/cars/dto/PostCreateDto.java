@@ -1,9 +1,11 @@
 package ru.job4j.cars.dto;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.job4j.cars.model.User;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +23,7 @@ public class PostCreateDto {
     private String gearbox;
     private String typeDrive;
     private Integer engineId;
+    private String ownerName;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date historyStartAt;
 }

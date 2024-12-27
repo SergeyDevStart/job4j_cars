@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface OwnerRepository {
+    Optional<Owner> findByUserId(Integer userId);
+
     Optional<Owner> save(Owner owner);
 
     Optional<Owner> findById(Integer id);

@@ -62,4 +62,18 @@ public class HibernateOwnerRepository implements OwnerRepository {
                 Owner.class
         );
     }
+
+    @Override
+    public Optional<Owner> findByUserId(Integer userId) {
+        return crudRepository.optional(
+                """
+                FROM Owner owner
+                JOIN FETCH owner.user
+                JOIN FETCH owner.historyOwners
+                WHERE owner.user.id = :userId
+                """,
+                Owner.class,
+                Map.of("userId", userId)
+        );
+    }
 }

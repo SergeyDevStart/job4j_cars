@@ -32,17 +32,21 @@ public class Car {
     @Column(name = "type_drive")
     private TypeDrive typeDrive;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "owner_id")
     private Owner owner;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne
     @JoinColumn(name = "engine_id", foreignKey = @ForeignKey(name = "ENGINE_ID_FK"))
     private Engine engine;
 
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @Builder.Default
     private Set<HistoryOwners> historyOwners = new HashSet<>();
 
     @OneToMany(mappedBy = "car")
+    @ToString.Exclude
+    @Builder.Default
     private Set<Participant> participates = new HashSet<>();
 }

@@ -1,5 +1,6 @@
 package ru.job4j.cars.service.post;
 
+import org.springframework.web.multipart.MultipartFile;
 import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.dto.PostCardDto;
 import ru.job4j.cars.dto.PostCreateDto;
@@ -9,7 +10,7 @@ import ru.job4j.cars.model.Post;
 import java.util.*;
 
 public interface PostService {
-    Optional<Post> create(PostCreateDto postDto, Set<FileDto> fileDtoSet);
+    Optional<Post> create(PostCreateDto postDto, MultipartFile[] files);
 
     boolean update(Post post);
 

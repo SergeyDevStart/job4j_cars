@@ -23,4 +23,6 @@
     <include file="scripts/016_ddl_alter_auto_post_table.sql" relativeToChangelogFile="true"/>
     <include file="scripts/017_ddl_alter_auto_post_table.sql" relativeToChangelogFile="true"/>
     <include file="scripts/018_dml_insert_engine_table.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/019_ddl_alter_history_owners_table.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/020_ddl_drop_history_table.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

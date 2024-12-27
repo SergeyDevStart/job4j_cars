@@ -11,30 +11,39 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class HibernateOwnerService implements OwnerService {
-    private final OwnerRepository hibernateOwnerRepository;
+    private final OwnerRepository ownerRepository;
 
     @Override
     public Optional<Owner> save(Owner owner) {
-        return hibernateOwnerRepository.save(owner);
+        return ownerRepository.save(owner);
     }
 
     @Override
     public Optional<Owner> findById(Integer id) {
-        return hibernateOwnerRepository.findById(id);
+        return ownerRepository.findById(id);
     }
 
     @Override
     public boolean update(Owner owner) {
-        return hibernateOwnerRepository.update(owner);
+        return ownerRepository.update(owner);
     }
 
     @Override
     public boolean deleteById(Integer id) {
-        return hibernateOwnerRepository.deleteById(id);
+        return ownerRepository.deleteById(id);
     }
 
     @Override
     public Collection<Owner> findAll() {
-        return hibernateOwnerRepository.findAll();
+        return ownerRepository.findAll();
+    }
+
+    @Override
+    public Optional<Owner> findByUserId(Integer userId) {
+        return ownerRepository.findByUserId(userId);
+    }
+
+    public String getOwnerNameIfExist(Integer userId) {
+        return ownerRepository.findByUserId(userId).map(Owner::getName).orElse("");
     }
 }

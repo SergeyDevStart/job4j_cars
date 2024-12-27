@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 public class PostCardDto {
-    private int id;
+    private Integer id;
     private String brand;
     private Integer fileId;
     private long price;

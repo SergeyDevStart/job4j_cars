@@ -16,7 +16,7 @@
         <form class="mt-3" th:action="@{/posts/create}" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="brand" class="form-label"><b>Бренд</b></label>
-                <select class="form-select" id="brand" name="brand">
+                <select class="form-select" id="brand" name="brand" required>
                     <option value="" disabled selected>Выберите марку машины</option>
                     <th:block th:each="brand : ${categories['brand']}">
                         <option th:value="${brand}" th:text="${brand}"></option>
@@ -25,7 +25,7 @@
             </div>
             <div class="mb-3">
                 <label for="carName" class="form-label"><b>Модель</b></label>
-                <input type="text" class="form-control" id="carName" name="carName" placeholder="Введите модель авто">
+                <input type="text" class="form-control" id="carName" name="carName" placeholder="Введите модель авто" required>
             </div>
             <div class="mb-3">
                 <label for="formFiles"><b>Фото</b></label>
@@ -37,7 +37,7 @@
             </div>
                 <div class="mb-3">
                     <label for="body" class="form-label"><b>Кузов</b></label>
-                    <select class="form-select" id="body" name="body">
+                    <select class="form-select" id="body" name="body" required>
                         <option value="" disabled selected>Выберите тип кузова</option>
                         <th:block th:each="body : ${categories['body']}">
                             <option th:value="${body}" th:text="${body}"></option>
@@ -46,7 +46,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="gearbox" class="form-label"><b>Коробка передач</b></label>
-                    <select class="form-select" id="gearbox" name="gearbox">
+                    <select class="form-select" id="gearbox" name="gearbox" required>
                         <option value="" disabled selected>Выберите коробку передач</option>
                         <th:block th:each="gearbox : ${categories['gearbox']}">
                             <option th:value="${gearbox}" th:text="${gearbox}"></option>
@@ -55,7 +55,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="typeDrive" class="form-label"><b>Привод</b></label>
-                    <select class="form-select" id="typeDrive" name="typeDrive">
+                    <select class="form-select" id="typeDrive" name="typeDrive" required>
                         <option value="" disabled selected>Выберите тип привода</option>
                         <th:block th:each="typeDrive : ${categories['typeDrive']}">
                             <option th:value="${typeDrive}" th:text="${typeDrive}"></option>
@@ -64,7 +64,7 @@
                 </div>
             <div class="mb-3">
                 <label for="engine" class="form-label"><b>Двигатель</b></label>
-                <select class="form-select" id="engine" name="engineId">
+                <select class="form-select" id="engine" name="engineId" required>
                     <option value="" disabled selected>Выберите тип двигателя</option>
                     <th:block th:each="engine : ${engines}">
                         <option th:value="${engine.id}" th:text="${engine.name}"></option>
@@ -72,8 +72,20 @@
                 </select>
             </div>
             <div class="mb-3">
+                <label for="ownerName" class="form-label"><b>Имя владельца</b></label>
+                <input type="text" class="form-control" id="ownerName" name="ownerName"
+                       th:placeholder="${#strings.isEmpty(ownerName) ? 'Укажите имя текущего владельца' : ''}"
+                       th:value="${ownerName}"
+                       th:readonly="${!#strings.isEmpty(ownerName)}"
+                       required>
+            </div>
+            <div class="mb-3">
+                <label for="historyStartAt" class="form-label"><b>Начало владения автомобилем</b></label>
+                <input type="date" class="form-control" id="historyStartAt" name="historyStartAt" required>
+            </div>
+            <div class="mb-3">
                 <label for="price" class="form-label"><b>Цена</b></label>
-                <input type="number" class="form-control" id="price" name="price" rows="5" placeholder="Укажите цену">
+                <input type="number" class="form-control" id="price" name="price" rows="5" placeholder="Укажите цену" required>
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label"><b>Описание</b></label>

@@ -22,6 +22,7 @@ public interface PostMapper {
 
     @Mapping(source = "price", target = "priceHistories", qualifiedByName = "toPriceHistoryFromPrice")
     @Mapping(source = "engineId", target = "car.engine.id")
+    @Mapping(source = "ownerName", target = "car.owner.name")
     @Mapping(source = "carName", target = "car.name")
     @Mapping(target = "brand", expression = "java(toEnumFromString(postCreateDto.getBrand(), ru.job4j.cars.model.Brand.class))")
     @Mapping(target = "car.body", expression = "java(toEnumFromString(postCreateDto.getBody(), ru.job4j.cars.model.Body.class))")
