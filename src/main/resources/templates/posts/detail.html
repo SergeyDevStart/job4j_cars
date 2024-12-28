@@ -102,7 +102,7 @@
                         <a class="btn btn-dark w-100" th:href="@{/posts/categories}">назад</a>
                     </div>
                     <div class="col-md-4">
-                        <a class="btn btn-info w-100" th:href="@{/posts/edit{id}/(id=${post.id})}">Редактировать</a>
+                        <a class="btn btn-info w-100" th:href="@{/posts/update/{id}/(id=${post.id})}">Редактировать</a>
                     </div>
                     <div class="col-md-4">
                         <a class="btn btn-danger w-100" th:href="@{/posts/delete/{id}(id=${post.id})}">Удалить</a>
