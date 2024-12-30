@@ -18,13 +18,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class HibernateFileService implements FileService {
-    private final FileRepository hibernateFileRepository;
+    private final FileRepository fileRepository;
     @Value("${file.directory}")
     private String storageDirectory;
 
     @Override
     public Optional<FileDto> findById(Integer id) {
-        var fileOptional = hibernateFileRepository.findById(id);
+        var fileOptional = fileRepository.findById(id);
         if (fileOptional.isEmpty()) {
             return Optional.empty();
         }
@@ -42,7 +42,7 @@ public class HibernateFileService implements FileService {
 
     @Override
     public Optional<File> save(FileDto fileDto) {
-        return hibernateFileRepository.save(toFileFromFileDto(fileDto));
+        return fileRepository.save(toFileFromFileDto(fileDto));
     }
 
     private String getNewFilePath(String sourceName) {
@@ -66,10 +66,10 @@ public class HibernateFileService implements FileService {
 
     @Override
     public void deleteById(Integer id) {
-        var fileOptional = hibernateFileRepository.findById(id);
+        var fileOptional = fileRepository.findById(id);
         if (fileOptional.isPresent()) {
             deleteFile(fileOptional.get().getPath());
-            hibernateFileRepository.delete(fileOptional.get());
+            fileRepository.delete(fileOptional.get());
         }
     }
 
@@ -90,7 +90,7 @@ public class HibernateFileService implements FileService {
 
     @Override
     public List<File> findAllByPostId(Integer postId) {
-        return  hibernateFileRepository.findAllByPostId(postId);
+        return  fileRepository.findAllByPostId(postId);
     }
 
     @Override

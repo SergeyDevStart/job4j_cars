@@ -35,8 +35,8 @@ public class HibernatePostService implements PostService {
 
     @Override
     public Optional<Post> create(PostCreateDto postDto, MultipartFile[] files) {
-        Set<FileDto> filesDto = processFiles(files);
         Post post = getPostFromPostDto(postDto);
+        Set<FileDto> filesDto = processFiles(files);
         saveNewFile(post, filesDto);
         saveHistoryOwners(post, postDto.getHistoryStartAt());
         return postRepository.create(post);
@@ -56,6 +56,7 @@ public class HibernatePostService implements PostService {
     }
 
     private void saveNewFile(Post post, Set<FileDto> fileDtoSet) {
+        post.getFiles().clear();
         for (FileDto fileDto : fileDtoSet) {
             File file = fileService.toFileFromFileDto(fileDto);
             post.addFile(file);
@@ -98,6 +99,20 @@ public class HibernatePostService implements PostService {
     @Override
     public boolean update(Post post) {
         return postRepository.update(post);
+    }
+
+    @Override
+    public boolean updateFiles(Integer postId, MultipartFile[] files) {
+        var optionalPost = postRepository.findPostWithFilesById(postId);
+        if (optionalPost.isEmpty()) {
+            log.warn("Post with ID {} not found", postId);
+            return false;
+        }
+        var filesToDelete = fileService.findAllByPostId(postId);
+        fileService.deleteFiles(filesToDelete);
+        Set<FileDto> filesDto = processFiles(files);
+        saveNewFile(optionalPost.get(), filesDto);
+        return update(optionalPost.get());
     }
 
     @Override

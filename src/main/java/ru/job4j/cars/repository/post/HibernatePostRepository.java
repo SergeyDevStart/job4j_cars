@@ -71,6 +71,19 @@ public class HibernatePostRepository implements PostRepository {
     }
 
     @Override
+    public Optional<Post> findPostWithFilesById(Integer id) {
+        return crudRepository.optional(
+                """
+                        FROM Post post
+                        LEFT JOIN FETCH post.files
+                        WHERE post.id = :id
+                        """,
+                Post.class,
+                Map.of("id", id)
+        );
+    }
+
+    @Override
     public Collection<Post> findAll() {
         Function<Session, Collection<Post>> command = session -> {
             EntityGraph<Post> entityGraph = session.createEntityGraph(Post.class);

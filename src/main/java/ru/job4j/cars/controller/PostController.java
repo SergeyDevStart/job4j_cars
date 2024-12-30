@@ -5,9 +5,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.dto.SearchDto;
-import ru.job4j.cars.model.Owner;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.service.engine.EngineService;
 import ru.job4j.cars.service.file.FileService;
@@ -68,7 +68,7 @@ public class PostController {
             postDto.setUser(user);
             postService.create(postDto, files);
         } catch (Exception e) {
-            model.addAttribute("message", "Не удалось создать объявление.");
+            model.addAttribute("error", "Не удалось создать объявление.");
             return "errors/404";
         }
         return "redirect:/index";
@@ -78,7 +78,7 @@ public class PostController {
     public String getPostById(@PathVariable("id") Integer id, Model model) {
         var optionalPost = postService.findById(id);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("message", "Not Found.");
+            model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         var post = optionalPost.get();
@@ -105,16 +105,50 @@ public class PostController {
         return "posts/categories";
     }
 
+    @GetMapping("/update/{id}")
+    public String updatePost(Model model, @PathVariable("id") Integer id) {
+        var optionalPost = postService.findById(id);
+        if (optionalPost.isEmpty()) {
+            model.addAttribute("error", "Объявление не найдено. ");
+            return "errors/404";
+        }
+        model.addAttribute("post", optionalPost.get());
+        return "posts/update";
+    }
+
+    @PostMapping("/updateFiles/{id}")
+    public String updateFiles(Model model,
+                              @PathVariable("id") Integer id,
+                              @RequestParam("files") MultipartFile[] files,
+                              RedirectAttributes attributes) {
+        var optionalPost = postService.findById(id);
+        if (optionalPost.isEmpty()) {
+            model.addAttribute("error", "Объявление не найдено. ");
+            return "errors/404";
+        }
+        var isUpdated = postService.updateFiles(id, files);
+        return isUpdatedPost(attributes, isUpdated, id);
+    }
+
     @GetMapping("/delete/{id}")
     public String deletePost(@PathVariable("id") Integer id, Model model) {
         var optionalPost = postService.findById(id);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("message", "Not Found.");
+            model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         var filesToDelete = fileService.findAllByPostId(optionalPost.get().getId());
         fileService.deleteFiles(filesToDelete);
         postService.delete(optionalPost.get());
         return "redirect:/posts/categories";
+    }
+
+    private String isUpdatedPost(RedirectAttributes attributes, boolean isUpdated, Integer id) {
+        if (!isUpdated) {
+            attributes.addFlashAttribute("message", "Не удалось обновить объявление.");
+        } else {
+            attributes.addFlashAttribute("message", "Объявление успешно обновлено");
+        }
+        return String.format("redirect:/posts/update/%s", id);
     }
 }

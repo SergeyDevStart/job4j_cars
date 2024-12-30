@@ -25,7 +25,7 @@ public class UserController {
     public String register(Model model, @ModelAttribute User user) {
         var savedUser = hibernateUserService.save(user);
         if (savedUser.isEmpty()) {
-            model.addAttribute("error", "Пользователь с таким логином уже существует.");
+            model.addAttribute("message", "Пользователь с таким логином уже существует.");
             return "users/register";
         }
         return "redirect:/posts/all";
@@ -40,7 +40,7 @@ public class UserController {
     public String login(Model model, @ModelAttribute User user, HttpServletRequest request) {
         var optionalUser = hibernateUserService.findByLoginAndPassword(user.getLogin(), user.getPassword());
         if (optionalUser.isEmpty()) {
-            model.addAttribute("error", "Почта или пароль введены неверно.");
+            model.addAttribute("message", "Почта или пароль введены неверно.");
             return "users/login";
         }
         var session = request.getSession();
