@@ -18,5 +18,6 @@ public class PriceHistory {
     private Long id;
     private long before;
     private long after;
+    @EqualsAndHashCode.Include
     private LocalDateTime created = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
 }

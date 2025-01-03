@@ -32,7 +32,7 @@ public class Car {
     @Column(name = "type_drive")
     private TypeDrive typeDrive;
 
-    @ManyToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Owner owner;
 
@@ -43,6 +43,7 @@ public class Car {
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @Builder.Default
+    @OrderBy("endAt DESC")
     private Set<HistoryOwners> historyOwners = new HashSet<>();
 
     @OneToMany(mappedBy = "car")

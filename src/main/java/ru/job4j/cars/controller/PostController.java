@@ -6,12 +6,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.job4j.cars.dto.HistoryOwnersDto;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.dto.SearchDto;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.service.engine.EngineService;
-import ru.job4j.cars.service.file.FileService;
-import ru.job4j.cars.service.owner.OwnerService;
 import ru.job4j.cars.service.post.PostService;
 
 import javax.servlet.http.HttpSession;
@@ -22,8 +21,6 @@ import javax.servlet.http.HttpSession;
 public class PostController {
     private final PostService postService;
     private final EngineService engineService;
-    private final FileService fileService;
-    private final OwnerService ownerService;
 
     @GetMapping
     public String getPosts() {
@@ -51,8 +48,6 @@ public class PostController {
     @GetMapping("/create")
     public String getCreatePage(Model model, HttpSession session) {
         var user = (User) session.getAttribute("user");
-        var ownerName = ownerService.getOwnerNameIfExist(user.getId());
-        model.addAttribute("ownerName", ownerName);
         model.addAttribute("engines", engineService.findAll());
         model.addAttribute("categories", postService.getCategories());
         return "posts/create";
@@ -82,9 +77,8 @@ public class PostController {
             return "errors/404";
         }
         var post = optionalPost.get();
-        model.addAttribute("files", fileService.findAllByPostId(post.getId()));
-        model.addAttribute("price",
-                post.getPriceHistories().get(post.getPriceHistories().size() - 1).getAfter());
+        var priseHistories = postService.getSortedPriceHistories(post.getPriceHistories());
+        model.addAttribute("price", priseHistories.get(priseHistories.size() - 1).getAfter());
         model.addAttribute("post", post);
         return "posts/detail";
     }
@@ -126,7 +120,21 @@ public class PostController {
             model.addAttribute("error", "Объявление не найдено. ");
             return "errors/404";
         }
-        var isUpdated = postService.updateFiles(id, files);
+        var isUpdated = postService.updateFiles(optionalPost.get(), files);
+        return isUpdatedPost(attributes, isUpdated, id);
+    }
+
+    @PostMapping("/updateHistoryOwners/{id}")
+    public String updateHistoryOwners(Model model,
+                                      @PathVariable("id") Integer id,
+                                      RedirectAttributes attributes,
+                                      @ModelAttribute HistoryOwnersDto historyOwnersDto) {
+        var optionalPost = postService.findById(id);
+        if (optionalPost.isEmpty()) {
+            model.addAttribute("error", "Not Found.");
+            return "errors/404";
+        }
+        var isUpdated = postService.updateHistoryOwners(optionalPost.get(), historyOwnersDto);
         return isUpdatedPost(attributes, isUpdated, id);
     }
 
@@ -137,8 +145,6 @@ public class PostController {
             model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
-        var filesToDelete = fileService.findAllByPostId(optionalPost.get().getId());
-        fileService.deleteFiles(filesToDelete);
         postService.delete(optionalPost.get());
         return "redirect:/posts/categories";
     }

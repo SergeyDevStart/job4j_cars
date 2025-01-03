@@ -1,15 +1,21 @@
 package ru.job4j.cars.service.post;
 
 import org.springframework.web.multipart.MultipartFile;
+import ru.job4j.cars.dto.HistoryOwnersDto;
 import ru.job4j.cars.dto.PostCardDto;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.dto.SearchDto;
 import ru.job4j.cars.model.Post;
+import ru.job4j.cars.model.PriceHistory;
 
 import java.util.*;
 
 public interface PostService {
-    boolean updateFiles(Integer postId, MultipartFile[] files);
+    List<PriceHistory> getSortedPriceHistories(Set<PriceHistory> priceHistories);
+
+    boolean updateHistoryOwners(Post post, HistoryOwnersDto historyOwnersDto);
+
+    boolean updateFiles(Post post, MultipartFile[] files);
 
     Optional<Post> create(PostCreateDto postDto, MultipartFile[] files);
 

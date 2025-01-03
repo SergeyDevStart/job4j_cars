@@ -23,7 +23,7 @@ public class HistoryOwners {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "owner_id")
     private Owner owner;
 

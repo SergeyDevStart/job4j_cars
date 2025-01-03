@@ -9,9 +9,7 @@ import ru.job4j.cars.model.File;
 import ru.job4j.cars.model.Post;
 import ru.job4j.cars.model.PriceHistory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Mapper(componentModel = "spring")
 public interface PostMapper {
@@ -39,16 +37,18 @@ public interface PostMapper {
     }
 
     @Named("toPriceFromPriceHistories")
-    default long toPriceFromPriceHistories(List<PriceHistory> priceHistories) {
-        return priceHistories.isEmpty() ? 0 : priceHistories.get(priceHistories.size() - 1).getAfter();
+    default long toPriceFromPriceHistories(Set<PriceHistory> priceHistories) {
+        List<PriceHistory> sortedList = new ArrayList<>(priceHistories);
+        sortedList.sort(Comparator.comparing(PriceHistory::getCreated));
+        return sortedList.isEmpty() ? 0 : sortedList.get(sortedList.size() - 1).getAfter();
     }
 
     @Named("toPriceHistoryFromPrice")
-    default List<PriceHistory> toPriceHistoryFromPrice(long price) {
+    default Set<PriceHistory> toPriceHistoryFromPrice(long price) {
         var priceHistory = new PriceHistory();
         priceHistory.setBefore(0);
         priceHistory.setAfter(price);
-        List<PriceHistory> priceHistories = new ArrayList<>();
+        Set<PriceHistory> priceHistories = new HashSet<>();
         priceHistories.add(priceHistory);
         return priceHistories;
     }

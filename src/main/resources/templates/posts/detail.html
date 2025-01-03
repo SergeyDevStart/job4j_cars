@@ -14,13 +14,13 @@
     <header th:insert="~{blocks/header :: header}"></header>
     <div class="container">
         <div class="row justify-content-md-center" style="overflow-x: auto; white-space: nowrap;">
-            <div class="d-flex flex-wrap" th:if="${!files.isEmpty()}">
-                <figure class="figure m-2" th:each="file : ${files}">
+            <div class="d-flex flex-wrap" th:if="${!post.files.isEmpty()}">
+                <figure class="figure m-2" th:each="file : ${post.files}">
                     <img th:src="@{/files/{fileId}(fileId=${file.getId})}"
                          alt="" width="250px" height="auto" class="img-thumbnail">
                 </figure>
             </div>
-            <div class="d-flex flex-wrap" th:if="${files.isEmpty()}">
+            <div class="d-flex flex-wrap" th:if="${post.files.isEmpty()}">
                 <img th:src="'/img/alt.png'" alt="Фото отсутствуют"
                      width="450px" height="auto">
             </div>
@@ -86,7 +86,7 @@
                             <tr th:each="historyOwner : ${post.car.historyOwners}">
                                 <td th:text="${historyOwner.owner.name}"></td>
                                 <td th:text="${#temporals.format(historyOwner.startAt, 'dd.MM.yyyy')}"></td>
-                                <td th:text="${historyOwner.endAt != null ? #temporals.format(historyOwner.endAt, 'dd.MM.yyyy') : '-'}"></td>
+                                <td th:text="${#temporals.format(historyOwner.endAt, 'dd.MM.yyyy')}"></td>
                             </tr>
                             </tbody>
                         </table>

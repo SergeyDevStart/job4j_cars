@@ -14,7 +14,7 @@ public interface FileService {
 
     File toFileFromFileDto(FileDto fileDto);
 
-    void deleteById(Integer id);
+    void delete(File file);
 
     FileDto getNewFileDto(String name, byte[] content);
 

@@ -73,11 +73,7 @@
             </div>
             <div class="mb-3">
                 <label for="ownerName" class="form-label"><b>Имя владельца</b></label>
-                <input type="text" class="form-control" id="ownerName" name="ownerName"
-                       th:placeholder="${#strings.isEmpty(ownerName) ? 'Укажите имя текущего владельца' : ''}"
-                       th:value="${ownerName}"
-                       th:readonly="${!#strings.isEmpty(ownerName)}"
-                       required>
+                <input type="text" class="form-control" id="ownerName" name="ownerName" placeholder="Укажите имя текущего владельца" required>
             </div>
             <div class="mb-3">
                 <label for="historyStartAt" class="form-label"><b>Начало владения автомобилем</b></label>

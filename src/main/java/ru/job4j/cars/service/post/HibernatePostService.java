@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.job4j.cars.dto.FileDto;
-import ru.job4j.cars.dto.PostCardDto;
-import ru.job4j.cars.dto.PostCreateDto;
-import ru.job4j.cars.dto.SearchDto;
+import ru.job4j.cars.dto.*;
 import ru.job4j.cars.mappers.PostMapper;
 import ru.job4j.cars.model.*;
 import ru.job4j.cars.repository.engine.EngineRepository;
@@ -68,31 +65,20 @@ public class HibernatePostService implements PostService {
             throw new IllegalArgumentException("History start date cannot be null");
         }
         Car car = post.getCar();
-        Owner owner = getOrCreateOwner(post, car);
-        var historyOwners = createHistoryOwners(car, owner, historyStartAt);
+        Owner owner = car.getOwner();
+        owner.setUser(post.getUser());
+        var startAt = historyStartAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        var endAt = LocalDate.now(ZoneId.systemDefault());
+        var historyOwners = createHistoryOwners(car, owner, startAt, endAt);
         historyOwnersRepository.save(historyOwners);
     }
 
-    private Owner getOrCreateOwner(Post post, Car car) {
-        var optionalOwner = ownerService.findByUserId(post.getUser().getId());
-        Owner owner;
-        if (optionalOwner.isEmpty()) {
-            owner = car.getOwner();
-            owner.setUser(post.getUser());
-            ownerService.save(owner);
-        } else {
-            owner = optionalOwner.get();
-            car.setOwner(owner);
-        }
-        return owner;
-    }
-
-    private HistoryOwners createHistoryOwners(Car car, Owner owner, Date historyStartAt) {
+    private HistoryOwners createHistoryOwners(Car car, Owner owner, LocalDate startAt, LocalDate endAt) {
         HistoryOwners historyOwners = new HistoryOwners();
         historyOwners.setCar(car);
         historyOwners.setOwner(owner);
-        historyOwners.setStartAt(historyStartAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        historyOwners.setEndAt(LocalDate.now(ZoneId.systemDefault()));
+        historyOwners.setStartAt(startAt);
+        historyOwners.setEndAt(endAt);
         return historyOwners;
     }
 
@@ -102,21 +88,34 @@ public class HibernatePostService implements PostService {
     }
 
     @Override
-    public boolean updateFiles(Integer postId, MultipartFile[] files) {
-        var optionalPost = postRepository.findPostWithFilesById(postId);
-        if (optionalPost.isEmpty()) {
-            log.warn("Post with ID {} not found", postId);
-            return false;
-        }
-        var filesToDelete = fileService.findAllByPostId(postId);
+    public boolean updateFiles(Post post, MultipartFile[] files) {
+        var filesToDelete = fileService.findAllByPostId(post.getId());
         fileService.deleteFiles(filesToDelete);
         Set<FileDto> filesDto = processFiles(files);
-        saveNewFile(optionalPost.get(), filesDto);
-        return update(optionalPost.get());
+        saveNewFile(post, filesDto);
+        return update(post);
+    }
+
+    @Override
+    public boolean updateHistoryOwners(Post post, HistoryOwnersDto historyOwnersDto) {
+        var optionalOwner = ownerService.save(Owner.builder().name(historyOwnersDto.getOwnerName()).build());
+        if (optionalOwner.isEmpty()) {
+            log.warn("Error creating entity Owner");
+            return false;
+        }
+        Car car = post.getCar();
+        var startAt = historyOwnersDto.getHistoryStartAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        var endAt = historyOwnersDto.getHistoryEndAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        createHistoryOwners(car, optionalOwner.get(), startAt, endAt);
+        return update(post);
     }
 
     @Override
     public boolean delete(Post post) {
+        var filesToDelete = new ArrayList<>(post.getFiles());
+        if (!filesToDelete.isEmpty()) {
+            fileService.deleteFiles(filesToDelete);
+        }
         return postRepository.delete(post);
     }
 
@@ -177,6 +176,13 @@ public class HibernatePostService implements PostService {
         enumMap.put("gearbox", Arrays.stream(Gearbox.values()).map(Enum::name).toList());
         enumMap.put("typeDrive", Arrays.stream(TypeDrive.values()).map(Enum::name).toList());
         return enumMap;
+    }
+
+    @Override
+    public List<PriceHistory> getSortedPriceHistories(Set<PriceHistory> priceHistories) {
+        return priceHistories.isEmpty() ? new ArrayList<>() : priceHistories.stream()
+                .sorted(Comparator.comparing(PriceHistory::getCreated))
+                .collect(Collectors.toList());
     }
 
     @Override

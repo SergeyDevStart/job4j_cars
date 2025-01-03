@@ -58,9 +58,11 @@ public class HibernatePostRepository implements PostRepository {
     public Optional<Post> findById(Integer id) {
         Function<Session, Optional<Post>> command = session -> {
             EntityGraph<Post> entityGraph = session.createEntityGraph(Post.class);
-            entityGraph.addAttributeNodes("priceHistories", "car");
+            entityGraph.addAttributeNodes("files", "priceHistories", "car");
             Subgraph<Car> carSubgraph = entityGraph.addSubgraph("car");
             carSubgraph.addAttributeNodes("engine", "owner", "historyOwners");
+            Subgraph<HistoryOwners> historyOwnersSubgraph = carSubgraph.addSubgraph("historyOwners");
+            historyOwnersSubgraph.addAttributeNodes("owner");
             var sq = session.createQuery(
                     "FROM Post WHERE id = :id", Post.class)
                     .setParameter("id", id)
