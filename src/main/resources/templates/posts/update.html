@@ -89,7 +89,7 @@
         </form>
 
         <div class="d-flex justify-content-between">
-            <a class="btn btn-success w-120" th:if="${!post.status}" th:href="@{/}">Снять с продажи</a>
+            <a class="btn btn-success w-120" th:if="${!post.status}" th:href="@{/posts/updateStatus/{id}(id=${post.id})}">Снять с продажи</a>
             <a class="btn btn-outline-danger w-120" th:href="@{/posts/{id}(id=${post.id})}">Назад</a>
         </div>
 
