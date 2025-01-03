@@ -111,6 +111,17 @@ public class HibernatePostService implements PostService {
     }
 
     @Override
+    public boolean updatePriceHistory(Post post, Long newPrice) {
+        List<PriceHistory> sortedPriceHistories = getSortedPriceHistories(post.getPriceHistories());
+        long oldPrice = sortedPriceHistories.get(sortedPriceHistories.size() - 1).getAfter();
+        PriceHistory priceHistory = new PriceHistory();
+        priceHistory.setBefore(oldPrice);
+        priceHistory.setAfter(newPrice);
+        post.getPriceHistories().add(priceHistory);
+        return update(post);
+    }
+
+    @Override
     public boolean delete(Post post) {
         var filesToDelete = new ArrayList<>(post.getFiles());
         if (!filesToDelete.isEmpty()) {

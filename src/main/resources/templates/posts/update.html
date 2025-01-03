@@ -59,7 +59,7 @@
             </div>
         </form>
 
-        <form class="mt-3" th:action="@{/}" method="post" enctype="multipart/form-data">
+        <form class="mt-3" th:action="@{/posts/updatePriceHistory/{id}(id=${post.id})}" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="price" class="form-label"><b>Цена</b></label>
                 <input type="number" class="form-control" id="price" name="price" rows="5" placeholder="Укажите желаемую цену" required>
