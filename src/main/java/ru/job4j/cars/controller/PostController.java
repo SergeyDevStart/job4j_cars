@@ -152,6 +152,20 @@ public class PostController {
         return isUpdatedPost(attributes, isUpdated, id);
     }
 
+    @PostMapping("/updateDescription/{id}")
+    public String updateDescription(Model model,
+                                    @PathVariable("id") Integer id,
+                                    RedirectAttributes attributes,
+                                    @RequestParam("description") String description) {
+        var optionalPost = postService.findById(id);
+        if (optionalPost.isEmpty()) {
+            model.addAttribute("error", "Not Found.");
+            return "errors/404";
+        }
+        var isUpdated = postService.updateDescription(optionalPost.get(), description);
+        return isUpdatedPost(attributes, isUpdated, id);
+    }
+
     @GetMapping("/delete/{id}")
     public String deletePost(@PathVariable("id") Integer id, Model model) {
         var optionalPost = postService.findById(id);

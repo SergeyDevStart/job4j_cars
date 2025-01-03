@@ -122,6 +122,12 @@ public class HibernatePostService implements PostService {
     }
 
     @Override
+    public boolean updateDescription(Post post, String description) {
+        post.setDescription(description);
+        return update(post);
+    }
+
+    @Override
     public boolean delete(Post post) {
         var filesToDelete = new ArrayList<>(post.getFiles());
         if (!filesToDelete.isEmpty()) {

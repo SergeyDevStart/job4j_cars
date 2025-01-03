@@ -11,6 +11,8 @@ import ru.job4j.cars.model.PriceHistory;
 import java.util.*;
 
 public interface PostService {
+    boolean updateDescription(Post post, String description);
+
     boolean updatePriceHistory(Post post, Long newPrice);
 
     List<PriceHistory> getSortedPriceHistories(Set<PriceHistory> priceHistories);
