@@ -99,6 +99,17 @@ public class HibernatePostRepository implements PostRepository {
     }
 
     @Override
+    public Integer getUserIdByPostId(Integer postId) {
+        Function<Session, Integer> command = session -> {
+            var query = session.createQuery(
+                    "SELECT p.user.id FROM Post p WHERE p.id = :postId", Integer.class);
+            query.setParameter("postId", postId);
+            return query.uniqueResult();
+        };
+        return crudRepository.tx(command);
+    }
+
+    @Override
     public Collection<Post> findPostsWithFile() {
         return crudRepository.query(
                 """

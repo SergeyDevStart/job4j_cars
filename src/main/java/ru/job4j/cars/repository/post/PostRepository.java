@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository {
+    Integer getUserIdByPostId(Integer postId);
+
     Optional<Post> findPostWithFilesById(Integer id);
 
     Optional<Post> create(Post post);

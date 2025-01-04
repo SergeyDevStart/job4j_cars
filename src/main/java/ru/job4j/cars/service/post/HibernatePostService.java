@@ -212,4 +212,9 @@ public class HibernatePostService implements PostService {
     public List<Post> findSearchResult(SearchDto searchDto) {
         return postRepository.findSearchResult(searchDto);
     }
+
+    @Override
+    public Integer getUserIdByPostId(Integer postId) {
+        return postRepository.getUserIdByPostId(postId);
+    }
 }

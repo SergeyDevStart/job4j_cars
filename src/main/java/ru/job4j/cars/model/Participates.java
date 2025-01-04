@@ -9,15 +9,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "participates")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Participant {
+public class Participates {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "car_id")
-    private Car car;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "post_id")

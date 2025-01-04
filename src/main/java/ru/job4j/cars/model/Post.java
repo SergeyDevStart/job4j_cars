@@ -25,7 +25,7 @@ public class Post {
     private LocalDateTime created = LocalDateTime.now().withSecond(0);
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "auto_user_id")
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -44,8 +44,9 @@ public class Post {
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private Car car;
 
-    @OneToMany(mappedBy = "post")
-    private Set<Participant> participates = new HashSet<>();
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @Builder.Default
+    private Set<Participates> participates = new HashSet<>();
 
     public void addFile(File file) {
         files.add(file);

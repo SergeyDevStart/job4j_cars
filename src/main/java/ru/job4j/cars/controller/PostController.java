@@ -70,14 +70,18 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public String getPostById(@PathVariable("id") Integer id, Model model) {
+    public String getPostById(@PathVariable("id") Integer id, Model model, HttpSession session) {
         var optionalPost = postService.findById(id);
         if (optionalPost.isEmpty()) {
             model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         var post = optionalPost.get();
+        User currentUser = (User) session.getAttribute("user");
+        Integer userIdByPost = postService.getUserIdByPostId(post.getId());
         var priseHistories = postService.getSortedPriceHistories(post.getPriceHistories());
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("userIdByPost", userIdByPost);
         model.addAttribute("price", priseHistories.get(priseHistories.size() - 1).getAfter());
         model.addAttribute("post", post);
         return "posts/detail";

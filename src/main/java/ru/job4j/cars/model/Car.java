@@ -45,9 +45,4 @@ public class Car {
     @Builder.Default
     @OrderBy("endAt DESC")
     private Set<HistoryOwners> historyOwners = new HashSet<>();
-
-    @OneToMany(mappedBy = "car")
-    @ToString.Exclude
-    @Builder.Default
-    private Set<Participant> participates = new HashSet<>();
 }

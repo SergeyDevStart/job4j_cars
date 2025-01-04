@@ -24,6 +24,6 @@
         <mapping class="ru.job4j.cars.model.HistoryOwners"/>
         <mapping class="ru.job4j.cars.model.History"/>
         <mapping class="ru.job4j.cars.model.File"/>
-        <mapping class="ru.job4j.cars.model.Participant"/>
+        <mapping class="ru.job4j.cars.model.Participates"/>
     </session-factory>
 </hibernate-configuration>

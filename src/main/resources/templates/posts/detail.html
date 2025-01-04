@@ -13,6 +13,9 @@
 <div class="container-fluid p-0">
     <header th:insert="~{blocks/header :: header}"></header>
     <div class="container">
+        <div class="mb-3" th:if="${message}">
+            <p class="text-info text-center" th:text="${message}"></p>
+        </div>
         <div class="row justify-content-md-center" style="overflow-x: auto; white-space: nowrap;">
             <div class="d-flex flex-wrap" th:if="${!post.files.isEmpty()}">
                 <figure class="figure m-2" th:each="file : ${post.files}">
@@ -98,14 +101,17 @@
             <div class="col-6"></div>
             <div class="col-6">
                 <div class="row">
+                    <div class="col-md-4" th:if="${currentUser.login != 'guest' && currentUser.id == userIdByPost}">
+                        <a class="btn btn-danger w-100" th:href="@{/posts/delete/{id}(id=${post.id})}">Удалить</a>
+                    </div>
+                    <div class="col-md-4" th:if="${currentUser.login != 'guest' && currentUser.id != userIdByPost}">
+                        <a class="btn btn-warning w-100" th:href="@{/users/subscribe/{id}(id=${post.id})}">Подписаться</a>
+                    </div>
+                    <div class="col-md-4" th:if="${currentUser.login != 'guest' && currentUser.id == userIdByPost}">
+                        <a class="btn btn-info w-100" th:href="@{/posts/update/{id}(id=${post.id})}">Редактировать</a>
+                    </div>
                     <div class="col-md-4">
                         <a class="btn btn-dark w-100" th:href="@{/posts/categories}">назад</a>
-                    </div>
-                    <div class="col-md-4">
-                        <a class="btn btn-info w-100" th:href="@{/posts/update/{id}/(id=${post.id})}">Редактировать</a>
-                    </div>
-                    <div class="col-md-4">
-                        <a class="btn btn-danger w-100" th:href="@{/posts/delete/{id}(id=${post.id})}">Удалить</a>
                     </div>
                 </div>
             </div>
