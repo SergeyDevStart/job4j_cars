@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository {
+    Collection<Post> findAllPostsBySubscriptions(Integer userId);
+
+    Collection<Post> findAllByUserId(Integer userId);
+
     Integer getUserIdByPostId(Integer postId);
 
     Optional<Post> findPostWithFilesById(Integer id);

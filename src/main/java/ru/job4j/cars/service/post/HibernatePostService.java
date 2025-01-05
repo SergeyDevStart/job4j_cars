@@ -153,6 +153,16 @@ public class HibernatePostService implements PostService {
     }
 
     @Override
+    public Collection<Post> findAllByUserId(Integer userId) {
+        return postRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public Collection<Post> findAllPostsBySubscriptions(Integer userId) {
+        return postRepository.findAllPostsBySubscriptions(userId);
+    }
+
+    @Override
     public Collection<Post> findAll() {
         return postRepository.findAll();
     }

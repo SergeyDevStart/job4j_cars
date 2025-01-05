@@ -11,6 +11,10 @@ import ru.job4j.cars.model.PriceHistory;
 import java.util.*;
 
 public interface PostService {
+    Collection<Post> findAllPostsBySubscriptions(Integer userId);
+
+    Collection<Post> findAllByUserId(Integer userId);
+
     Integer getUserIdByPostId(Integer postId);
 
     boolean updateStatus(Post post);

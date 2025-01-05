@@ -29,19 +29,38 @@ public class PostController {
 
     @GetMapping("/all")
     public String getAll(Model model) {
-        model.addAttribute("posts", postService.getPostCardDtoList(postService.findAll()));
+        model.addAttribute("posts", postService.getPostCardDtoList(
+                postService.findAll()));
         return "posts/list";
     }
 
     @GetMapping("/lastDay")
     public String getPostForTheLastDay(Model model) {
-        model.addAttribute("posts", postService.getPostCardDtoList(postService.findAllLastDay()));
+        model.addAttribute("posts", postService.getPostCardDtoList(
+                postService.findAllLastDay()));
         return "posts/list";
     }
 
     @GetMapping("withFile")
     public String getPostWithFIle(Model model) {
-        model.addAttribute("posts", postService.getPostCardDtoList(postService.findPostsWithFile()));
+        model.addAttribute("posts", postService.getPostCardDtoList(
+                postService.findPostsWithFile()));
+        return "posts/list";
+    }
+
+    @GetMapping("/myPosts")
+    public String getMyPosts(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("posts", postService.getPostCardDtoList(
+                postService.findAllByUserId(user.getId())));
+        return "posts/list";
+    }
+
+    @GetMapping("/mySubscriptions")
+    public String getMySubscriptions(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("posts", postService.getPostCardDtoList(
+                postService.findAllPostsBySubscriptions(user.getId())));
         return "posts/list";
     }
 

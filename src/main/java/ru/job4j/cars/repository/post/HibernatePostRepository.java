@@ -110,6 +110,37 @@ public class HibernatePostRepository implements PostRepository {
     }
 
     @Override
+    public Collection<Post> findAllByUserId(Integer userId) {
+        return crudRepository.query(
+                """
+                        SELECT DISTINCT post
+                        FROM Post post
+                        LEFT JOIN FETCH post.files
+                        LEFT JOIN FETCH post.priceHistories
+                        WHERE post.user.id = :userId
+                        """,
+                Post.class,
+                Map.of("userId", userId)
+        );
+    }
+
+    @Override
+    public Collection<Post> findAllPostsBySubscriptions(Integer userId) {
+        return crudRepository.query(
+                """
+                        SELECT DISTINCT post
+                        FROM Participates part
+                        JOIN part.post post
+                        LEFT JOIN FETCH post.files
+                        LEFT JOIN FETCH post.priceHistories
+                        WHERE part.user.id = :userId
+                        """,
+                Post.class,
+                Map.of("userId", userId)
+        );
+    }
+
+    @Override
     public Collection<Post> findPostsWithFile() {
         return crudRepository.query(
                 """
