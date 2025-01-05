@@ -17,17 +17,12 @@ import javax.servlet.http.HttpSession;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping("/posts")
+@RequestMapping(value = {"/", "/index", "/posts"})
 public class PostController {
     private final PostService postService;
     private final EngineService engineService;
 
     @GetMapping
-    public String getPosts() {
-        return "index";
-    }
-
-    @GetMapping("/all")
     public String getAll(Model model) {
         model.addAttribute("posts", postService.getPostCardDtoList(
                 postService.findAll()));

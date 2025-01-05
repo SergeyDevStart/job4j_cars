@@ -50,7 +50,7 @@ public class UserController {
         }
         var session = request.getSession();
         session.setAttribute("user", optionalUser.get());
-        return "redirect:/posts/all";
+        return "redirect:/posts/myPosts";
     }
 
     @GetMapping("/logout")

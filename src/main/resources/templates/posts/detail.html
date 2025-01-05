@@ -101,13 +101,13 @@
             <div class="col-6"></div>
             <div class="col-6">
                 <div class="row">
-                    <div class="col-md-4" th:if="${currentUser.login != 'guest' && currentUser.id == userIdByPost}">
+                    <div class="col-md-4" th:if="${currentUser != null && currentUser.login != 'guest' && currentUser.id == userIdByPost}">
                         <a class="btn btn-danger w-100" th:href="@{/posts/delete/{id}(id=${post.id})}">Удалить</a>
                     </div>
-                    <div class="col-md-4" th:if="${currentUser.login != 'guest' && currentUser.id != userIdByPost}">
+                    <div class="col-md-4" th:if="${currentUser != null && currentUser.login != 'guest' && currentUser.id != userIdByPost}">
                         <a class="btn btn-warning w-100" th:href="@{/users/subscribe/{id}(id=${post.id})}">Подписаться</a>
                     </div>
-                    <div class="col-md-4" th:if="${currentUser.login != 'guest' && currentUser.id == userIdByPost}">
+                    <div class="col-md-4" th:if="${currentUser != null && currentUser.login != 'guest' && currentUser.id == userIdByPost}">
                         <a class="btn btn-info w-100" th:href="@{/posts/update/{id}(id=${post.id})}">Редактировать</a>
                     </div>
                     <div class="col-md-4">

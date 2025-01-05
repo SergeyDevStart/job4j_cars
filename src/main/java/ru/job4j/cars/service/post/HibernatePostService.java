@@ -33,8 +33,10 @@ public class HibernatePostService implements PostService {
     @Override
     public Optional<Post> create(PostCreateDto postDto, MultipartFile[] files) {
         Post post = getPostFromPostDto(postDto);
-        Set<FileDto> filesDto = processFiles(files);
-        saveNewFile(post, filesDto);
+        if (files.length != 0 && files[0].getSize() != 0) {
+            Set<FileDto> filesDto = processFiles(files);
+            saveNewFile(post, filesDto);
+        }
         saveHistoryOwners(post, postDto.getHistoryStartAt());
         return postRepository.create(post);
     }
