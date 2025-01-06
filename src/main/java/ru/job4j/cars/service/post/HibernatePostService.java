@@ -8,13 +8,11 @@ import ru.job4j.cars.dto.*;
 import ru.job4j.cars.mappers.PostMapper;
 import ru.job4j.cars.model.*;
 import ru.job4j.cars.repository.engine.EngineRepository;
-import ru.job4j.cars.repository.historyowners.HistoryOwnersRepository;
 import ru.job4j.cars.repository.post.PostRepository;
 import ru.job4j.cars.service.file.FileService;
+import ru.job4j.cars.service.historyowners.HibernateHistoryOwnersService;
 import ru.job4j.cars.service.owner.OwnerService;
 
-import java.io.IOException;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,31 +25,17 @@ public class HibernatePostService implements PostService {
     private final EngineRepository engineRepository;
     private final FileService fileService;
     private final OwnerService ownerService;
-    private final HistoryOwnersRepository historyOwnersRepository;
+    private final HibernateHistoryOwnersService historyOwnersService;
     private final PostMapper postMapper;
 
     @Override
     public Optional<Post> create(PostCreateDto postDto, MultipartFile[] files) {
         Post post = getPostFromPostDto(postDto);
         if (files.length != 0 && files[0].getSize() != 0) {
-            Set<FileDto> filesDto = processFiles(files);
-            saveNewFile(post, filesDto);
+            saveNewFile(post, fileService.processFiles(files));
         }
-        saveHistoryOwners(post, postDto.getHistoryStartAt());
+        historyOwnersService.saveHistoryOwnersInPost(post, postDto.getHistoryStartAt());
         return postRepository.create(post);
-    }
-
-    private Set<FileDto> processFiles(MultipartFile[] files) {
-        Set<FileDto> filesDto = new HashSet<>();
-        for (MultipartFile file : files) {
-            try {
-                var fileDto = fileService.getNewFileDto(file.getOriginalFilename(), file.getBytes());
-                filesDto.add(fileDto);
-            } catch (IOException e) {
-                log.warn("Failed to process file: {}", file.getOriginalFilename(), e);
-            }
-        }
-        return filesDto;
     }
 
     private void saveNewFile(Post post, Set<FileDto> fileDtoSet) {
@@ -60,28 +44,6 @@ public class HibernatePostService implements PostService {
             File file = fileService.toFileFromFileDto(fileDto);
             post.addFile(file);
         }
-    }
-
-    private void saveHistoryOwners(Post post, Date historyStartAt) {
-        if (historyStartAt == null) {
-            throw new IllegalArgumentException("History start date cannot be null");
-        }
-        Car car = post.getCar();
-        Owner owner = car.getOwner();
-        owner.setUser(post.getUser());
-        var startAt = historyStartAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        var endAt = LocalDate.now(ZoneId.systemDefault());
-        var historyOwners = createHistoryOwners(car, owner, startAt, endAt);
-        historyOwnersRepository.save(historyOwners);
-    }
-
-    private HistoryOwners createHistoryOwners(Car car, Owner owner, LocalDate startAt, LocalDate endAt) {
-        HistoryOwners historyOwners = new HistoryOwners();
-        historyOwners.setCar(car);
-        historyOwners.setOwner(owner);
-        historyOwners.setStartAt(startAt);
-        historyOwners.setEndAt(endAt);
-        return historyOwners;
     }
 
     @Override
@@ -93,8 +55,7 @@ public class HibernatePostService implements PostService {
     public boolean updateFiles(Post post, MultipartFile[] files) {
         var filesToDelete = fileService.findAllByPostId(post.getId());
         fileService.deleteFiles(filesToDelete);
-        Set<FileDto> filesDto = processFiles(files);
-        saveNewFile(post, filesDto);
+        saveNewFile(post, fileService.processFiles(files));
         return update(post);
     }
 
@@ -108,7 +69,7 @@ public class HibernatePostService implements PostService {
         Car car = post.getCar();
         var startAt = historyOwnersDto.getHistoryStartAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         var endAt = historyOwnersDto.getHistoryEndAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        createHistoryOwners(car, optionalOwner.get(), startAt, endAt);
+        historyOwnersService.createHistoryOwners(car, optionalOwner.get(), startAt, endAt);
         return update(post);
     }
 
@@ -184,16 +145,12 @@ public class HibernatePostService implements PostService {
         return postRepository.findByBrand(brand);
     }
 
-    private <T> Post getPostFromPostDto(T dto) {
-        if (dto instanceof PostCreateDto) {
-            Post post = postMapper.toPostFromPostCreateDto((PostCreateDto) dto);
-            Engine engine = engineRepository.findById(((PostCreateDto) dto).getEngineId()).orElseThrow(() ->
-                    new IllegalArgumentException("Engine with id not found"));
-            post.getCar().setEngine(engine);
-            return post;
-        } else {
-            throw new IllegalArgumentException("Unsupported DTO type");
-        }
+    private Post getPostFromPostDto(PostCreateDto dto) {
+        Post post = postMapper.toPostFromPostCreateDto(dto);
+        Engine engine = engineRepository.findById(dto.getEngineId()).orElseThrow(() ->
+                new IllegalArgumentException("Engine with id not found"));
+        post.getCar().setEngine(engine);
+        return post;
     }
 
     @Override

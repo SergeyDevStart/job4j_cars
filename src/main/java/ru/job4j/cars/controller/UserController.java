@@ -33,7 +33,7 @@ public class UserController {
             model.addAttribute("message", "Пользователь с таким логином уже существует.");
             return "users/register";
         }
-        return "redirect:/posts/all";
+        return "redirect:/users/login";
     }
 
     @GetMapping("/login")

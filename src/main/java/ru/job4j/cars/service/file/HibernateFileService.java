@@ -1,8 +1,10 @@
 package ru.job4j.cars.service.file;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.job4j.cars.dto.FileDto;
 import ru.job4j.cars.model.File;
 import ru.job4j.cars.repository.file.FileRepository;
@@ -10,11 +12,10 @@ import ru.job4j.cars.repository.file.FileRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class HibernateFileService implements FileService {
     private final FileRepository fileRepository;
@@ -81,6 +82,20 @@ public class HibernateFileService implements FileService {
         for (File file : filesToDelete) {
             deleteFileByPath(file.getPath());
         }
+    }
+
+    @Override
+    public Set<FileDto> processFiles(MultipartFile[] files) {
+        Set<FileDto> filesDto = new HashSet<>();
+        for (MultipartFile file : files) {
+            try {
+                var fileDto = getNewFileDto(file.getOriginalFilename(), file.getBytes());
+                filesDto.add(fileDto);
+            } catch (IOException e) {
+                log.warn("Failed to process file: {}", file.getOriginalFilename(), e);
+            }
+        }
+        return filesDto;
     }
 
     @Override

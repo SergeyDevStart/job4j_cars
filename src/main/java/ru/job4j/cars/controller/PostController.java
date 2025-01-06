@@ -9,11 +9,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.cars.dto.HistoryOwnersDto;
 import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.dto.SearchDto;
+import ru.job4j.cars.model.Post;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.service.engine.EngineService;
 import ru.job4j.cars.service.post.PostService;
 
 import javax.servlet.http.HttpSession;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 @Controller
 @AllArgsConstructor
@@ -24,44 +28,33 @@ public class PostController {
 
     @GetMapping
     public String getAll(Model model) {
-        model.addAttribute("posts", postService.getPostCardDtoList(
-                postService.findAll()));
-        return "posts/list";
+        return showPosts(model, postService::findAll);
     }
 
     @GetMapping("/lastDay")
     public String getPostForTheLastDay(Model model) {
-        model.addAttribute("posts", postService.getPostCardDtoList(
-                postService.findAllLastDay()));
-        return "posts/list";
+        return showPosts(model, postService::findAllLastDay);
     }
 
     @GetMapping("withFile")
     public String getPostWithFIle(Model model) {
-        model.addAttribute("posts", postService.getPostCardDtoList(
-                postService.findPostsWithFile()));
-        return "posts/list";
+        return showPosts(model, postService::findPostsWithFile);
     }
 
     @GetMapping("/myPosts")
     public String getMyPosts(Model model, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        model.addAttribute("posts", postService.getPostCardDtoList(
-                postService.findAllByUserId(user.getId())));
-        return "posts/list";
+        User user = getCurrentUser(session);
+        return showPosts(model, () -> postService.findAllByUserId(user.getId()));
     }
 
     @GetMapping("/mySubscriptions")
     public String getMySubscriptions(Model model, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        model.addAttribute("posts", postService.getPostCardDtoList(
-                postService.findAllPostsBySubscriptions(user.getId())));
-        return "posts/list";
+        User user = getCurrentUser(session);
+        return showPosts(model, () -> postService.findAllPostsBySubscriptions(user.getId()));
     }
 
     @GetMapping("/create")
-    public String getCreatePage(Model model, HttpSession session) {
-        var user = (User) session.getAttribute("user");
+    public String getCreatePage(Model model) {
         model.addAttribute("engines", engineService.findAll());
         model.addAttribute("categories", postService.getCategories());
         return "posts/create";
@@ -72,26 +65,24 @@ public class PostController {
                               @RequestParam("files") MultipartFile[] files,
                               HttpSession session,
                               Model model) {
-        try {
-            var user = (User) session.getAttribute("user");
-            postDto.setUser(user);
-            postService.create(postDto, files);
-        } catch (Exception e) {
-            model.addAttribute("error", "Не удалось создать объявление.");
+        User user = getCurrentUser(session);
+        postDto.setUser(user);
+        var savedUser = postService.create(postDto, files);
+        if (savedUser.isEmpty()) {
+            model.addAttribute("error", "Не удалось создать пост.");
             return "errors/404";
         }
-        return "redirect:/index";
+        return "redirect:/posts/myPosts";
     }
 
     @GetMapping("/{id}")
     public String getPostById(@PathVariable("id") Integer id, Model model, HttpSession session) {
-        var optionalPost = postService.findById(id);
+        var optionalPost = findPostOrHandlerError(id, model);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         var post = optionalPost.get();
-        User currentUser = (User) session.getAttribute("user");
+        User currentUser = getCurrentUser(session);
         Integer userIdByPost = postService.getUserIdByPostId(post.getId());
         var priseHistories = postService.getSortedPriceHistories(post.getPriceHistories());
         model.addAttribute("currentUser", currentUser);
@@ -103,25 +94,18 @@ public class PostController {
 
     @GetMapping("/categories")
     public String getCategoriesPage(Model model) {
-        model.addAttribute("posts", postService.getPostCardDtoList(postService.findAll()));
-        model.addAttribute("engines", engineService.findAll());
-        model.addAttribute("categories", postService.getCategories());
-        return "posts/categories";
+        return showCategories(model, postService::findAll);
     }
 
     @PostMapping("/search")
     public String getSearchResult(@ModelAttribute SearchDto searchDto, Model model) {
-        model.addAttribute("posts", postService.getPostCardDtoList(postService.findSearchResult(searchDto)));
-        model.addAttribute("engines", engineService.findAll());
-        model.addAttribute("categories", postService.getCategories());
-        return "posts/categories";
+        return showCategories(model, () -> postService.findSearchResult(searchDto));
     }
 
     @GetMapping("/update/{id}")
     public String updatePost(Model model, @PathVariable("id") Integer id) {
-        var optionalPost = postService.findById(id);
+        var optionalPost = findPostOrHandlerError(id, model);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("error", "Объявление не найдено. ");
             return "errors/404";
         }
         model.addAttribute("post", optionalPost.get());
@@ -133,9 +117,8 @@ public class PostController {
                               @PathVariable("id") Integer id,
                               @RequestParam("files") MultipartFile[] files,
                               RedirectAttributes attributes) {
-        var optionalPost = postService.findById(id);
+        var optionalPost = findPostOrHandlerError(id, model);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("error", "Объявление не найдено. ");
             return "errors/404";
         }
         var isUpdated = postService.updateFiles(optionalPost.get(), files);
@@ -147,9 +130,8 @@ public class PostController {
                                       @PathVariable("id") Integer id,
                                       RedirectAttributes attributes,
                                       @ModelAttribute HistoryOwnersDto historyOwnersDto) {
-        var optionalPost = postService.findById(id);
+        var optionalPost = findPostOrHandlerError(id, model);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         var isUpdated = postService.updateHistoryOwners(optionalPost.get(), historyOwnersDto);
@@ -161,9 +143,8 @@ public class PostController {
                                      @PathVariable("id") Integer id,
                                      RedirectAttributes attributes,
                                      @RequestParam("price") Long price) {
-        var optionalPost = postService.findById(id);
+        var optionalPost = findPostOrHandlerError(id, model);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         var isUpdated = postService.updatePriceHistory(optionalPost.get(), price);
@@ -175,9 +156,8 @@ public class PostController {
                                     @PathVariable("id") Integer id,
                                     RedirectAttributes attributes,
                                     @RequestParam("description") String description) {
-        var optionalPost = postService.findById(id);
+        var optionalPost = findPostOrHandlerError(id, model);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         var isUpdated = postService.updateDescription(optionalPost.get(), description);
@@ -186,9 +166,8 @@ public class PostController {
 
     @GetMapping("/updateStatus/{id}")
     public String updateStatus(Model model, @PathVariable("id") Integer id, RedirectAttributes attributes) {
-        var optionalPost = postService.findById(id);
+        var optionalPost = findPostOrHandlerError(id, model);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         var isUpdated = postService.updateStatus(optionalPost.get());
@@ -197,13 +176,12 @@ public class PostController {
 
     @GetMapping("/delete/{id}")
     public String deletePost(@PathVariable("id") Integer id, Model model) {
-        var optionalPost = postService.findById(id);
+        var optionalPost = findPostOrHandlerError(id, model);
         if (optionalPost.isEmpty()) {
-            model.addAttribute("error", "Not Found.");
             return "errors/404";
         }
         postService.delete(optionalPost.get());
-        return "redirect:/posts/categories";
+        return "redirect:/posts/myPosts";
     }
 
     private String isUpdatedPost(RedirectAttributes attributes, boolean isUpdated, Integer id) {
@@ -213,5 +191,29 @@ public class PostController {
             attributes.addFlashAttribute("message", "Объявление успешно обновлено");
         }
         return String.format("redirect:/posts/update/%s", id);
+    }
+
+    private Optional<Post> findPostOrHandlerError(Integer id, Model model) {
+        var optionalPost = postService.findById(id);
+        if (optionalPost.isEmpty()) {
+            model.addAttribute("error", "Unknown error");
+        }
+        return optionalPost;
+    }
+
+    private User getCurrentUser(HttpSession session) {
+        return (User) session.getAttribute("user");
+    }
+
+    private String showPosts(Model model, Supplier<Collection<Post>> supplier) {
+        model.addAttribute("posts", postService.getPostCardDtoList(supplier.get()));
+        return "posts/list";
+    }
+
+    private String showCategories(Model model, Supplier<Collection<Post>> supplier) {
+        model.addAttribute("posts", postService.getPostCardDtoList(supplier.get()));
+        model.addAttribute("engines", engineService.findAll());
+        model.addAttribute("categories", postService.getCategories());
+        return "posts/categories";
     }
 }
