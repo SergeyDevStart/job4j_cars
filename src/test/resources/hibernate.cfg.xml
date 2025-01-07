@@ -5,10 +5,10 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">org.h2.Driver</property>
-        <property name="hibernate.connection.url">jdbc:h2:./testdb;MODE=PostgreSQL;CASE_INSENSITIVE_IDENTIFIERS=TRUE;AUTO_SERVER=TRUE;</property>
+        <property name="hibernate.connection.url">jdbc:h2:./testdb;MODE=PostgreSQL;CASE_INSENSITIVE_IDENTIFIERS=TRUE</property>
         <property name="hibernate.connection.username"></property>
         <property name="hibernate.connection.password"></property>
-        <property name="hibernate.connection.pool_size">1</property>
+        <property name="hibernate.connection.pool_size">10</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
@@ -22,7 +22,6 @@
         <mapping class="ru.job4j.cars.model.Engine"/>
         <mapping class="ru.job4j.cars.model.Owner"/>
         <mapping class="ru.job4j.cars.model.HistoryOwners"/>
-        <mapping class="ru.job4j.cars.model.History"/>
         <mapping class="ru.job4j.cars.model.File"/>
         <mapping class="ru.job4j.cars.model.Participates"/>
     </session-factory>

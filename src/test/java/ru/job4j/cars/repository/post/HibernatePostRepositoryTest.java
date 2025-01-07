@@ -63,23 +63,29 @@ class HibernatePostRepositoryTest {
         return user;
     }
 
-    private Set<File> getFiles() {
+    private Car getCar() {
+        Car car = Car.builder().name("AUDI").build();
+        crudRepository.run(session -> session.persist(car));
+        return car;
+    }
+
+    private void installFiles(Post post) {
         File file1 = new File("file1", "path1");
         File file2 = new File("file2", "path2");
-        return Set.of(file1, file2);
+        post.addFile(file1);
+        post.addFile(file2);
     }
 
     private Post getPost() {
-        return Post.builder()
-                .description("Desc")
-                .created(LocalDateTime.now())
-                .user(getUser())
-                .priceHistories(new ArrayList<>())
-                .files(getFiles())
-                .brand(Brand.AUDI)
-                .car(new Car())
-                .participates(new HashSet<>())
-                .build();
+        Post post = new Post();
+        post.setDescription("Desc");
+        post.setCreated(LocalDateTime.now());
+        post.setUser(getUser());
+        post.setBrand(Brand.AUDI);
+        post.setStatus(true);
+        post.setCar(getCar());
+        installFiles(post);
+        return post;
     }
 
     @Test
@@ -117,8 +123,9 @@ class HibernatePostRepositoryTest {
 
         postRepository.create(postWithFiles);
         postRepository.create(postWithoutFiles);
+        var expected = postRepository.findPostsWithFile();
 
-        assertThat(postRepository.findPostsWithFile()).contains(postWithFiles);
+        assertThat(expected).contains(postWithFiles);
     }
 
     @Test
