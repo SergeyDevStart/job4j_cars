@@ -83,6 +83,9 @@ job4j_cars - сервис по продаже машин.
 ![](img/myPosts.png)
 ![](img/subscriptions.png)
 
+#### Поиск по категориям
+![](img/category.png)
+
 ## Контакты
 ![SergeyDevStart](https://github.com/SergeyDevStart)
 ![Telegram](https://t.me/sergey_vasenev)
