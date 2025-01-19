@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.job4j.cars.dto.SearchDto;
 import ru.job4j.cars.model.*;
 import ru.job4j.cars.repository.CrudRepository;
 
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class HibernatePostRepositoryTest {
     private static SessionFactory sf;
@@ -44,6 +47,7 @@ class HibernatePostRepositoryTest {
         try (var session = sf.openSession()) {
             transaction = session.beginTransaction();
             session.createQuery("DELETE FROM File").executeUpdate();
+            session.createQuery("DELETE FROM Participates").executeUpdate();
             session.createQuery("DELETE FROM Post").executeUpdate();
             session.createQuery("DELETE FROM Car").executeUpdate();
             session.createQuery("DELETE FROM User").executeUpdate();
@@ -170,5 +174,121 @@ class HibernatePostRepositoryTest {
         Collection<Post> expected = List.of(post1, post2);
 
         assertThat(postRepository.findByBrand("AUDI")).isEqualTo(expected);
+    }
+
+    @Test
+    void whenCreatePostThrowsExceptionThenReturnEmptyOptional() {
+        Post post = getPost();
+        CrudRepository mockedCrudRepository = mock(CrudRepository.class);
+        PostRepository postRepository = new HibernatePostRepository(mockedCrudRepository);
+
+        doThrow(new RuntimeException("Database error"))
+                .when(mockedCrudRepository).run(any());
+
+        Optional<Post> result = postRepository.create(post);
+
+        assertThat(result).isEmpty();
+        verify(mockedCrudRepository).run(any());
+    }
+
+    @Test
+    void whenUpdatePostThrowsExceptionThenReturnFalse() {
+        Post post = getPost();
+        CrudRepository mockedCrudRepository = mock(CrudRepository.class);
+        PostRepository postRepository = new HibernatePostRepository(mockedCrudRepository);
+
+        doThrow(new RuntimeException("Database error"))
+                .when(mockedCrudRepository).run(any());
+
+        boolean result = postRepository.update(post);
+
+        assertThat(result).isFalse();
+        verify(mockedCrudRepository).run(any());
+    }
+
+    @Test
+    void whenDeletePostThrowsExceptionThenReturnFalse() {
+        Post post = getPost();
+        CrudRepository mockedCrudRepository = mock(CrudRepository.class);
+        PostRepository postRepository = new HibernatePostRepository(mockedCrudRepository);
+
+        doThrow(new RuntimeException("Database error"))
+                .when(mockedCrudRepository).run(any());
+
+        boolean result = postRepository.delete(post);
+
+        assertThat(result).isFalse();
+        verify(mockedCrudRepository).run(any());
+    }
+
+    @Test
+    void whenFindAllByUserIdThenGetUserPosts() {
+        User user = getUser();
+        Post firstPost = getPost();
+        Post secondPost = getPost();
+        firstPost.setUser(user);
+        secondPost.setUser(user);
+        postRepository.create(firstPost);
+        postRepository.create(secondPost);
+
+        var result = postRepository.findAllByUserId(user.getId());
+        assertThat(result).containsExactly(firstPost, secondPost);
+    }
+
+    @Test
+    void whenFindAllPostsBySubscriptionsThenGetCorrectPosts() {
+        User user = getUser();
+        Post post = getPost();
+        post.setUser(user);
+        postRepository.create(post);
+
+        Participates participates = new Participates();
+        participates.setPost(post);
+        participates.setUser(user);
+        crudRepository.run(session -> session.save(participates));
+
+        var result = postRepository.findAllPostsBySubscriptions(user.getId());
+        assertThat(result).containsExactly(post);
+    }
+
+    @Test
+    void whenFindSearchResultThenGetCorrectPosts() {
+        SearchDto searchDto = new SearchDto();
+        searchDto.setBrand("AUDI");
+
+        Post post = getPost();
+        post.setBrand(Brand.AUDI);
+
+        CrudRepository mockedCrudRepository = mock(CrudRepository.class);
+        PostRepository postRepository = new HibernatePostRepository(mockedCrudRepository);
+
+        when(mockedCrudRepository.tx(any()))
+                .thenReturn(List.of(post));
+
+        List<Post> result = postRepository.findSearchResult(searchDto);
+
+        assertThat(result).containsExactly(post);
+        verify(mockedCrudRepository).tx(any());
+    }
+
+    @Test
+    void whenFindSearchResultWithoutParametersThenGetAllPosts() {
+        SearchDto searchDto = new SearchDto();
+
+        Post postOne = getPost();
+        postOne.setBrand(Brand.AUDI);
+        Post postTwo = getPost();
+        postTwo.setBrand(Brand.BMW);
+
+        CrudRepository mockedCrudRepository = mock(CrudRepository.class);
+        PostRepository postRepository = new HibernatePostRepository(mockedCrudRepository);
+
+        when(mockedCrudRepository.tx(any()))
+                .thenReturn(List.of(postOne, postTwo));
+
+        List<Post> result = postRepository.findSearchResult(searchDto);
+
+        assertThat(result).containsExactly(postOne, postTwo);
+        verify(mockedCrudRepository).tx(any());
     }
 }
