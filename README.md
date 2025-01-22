@@ -1,5 +1,7 @@
 # job4j_cars
 
+![CI GitHubAction](https://github.com/SergeyDevStart/job4j_cars/blob/master/.github/workflows/maven.yml/badge.svg)
+
 ## Описание проекта
 job4j_cars - сервис по продаже машин.
 Возможности сервиса:
